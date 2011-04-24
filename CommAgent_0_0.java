@@ -7,7 +7,7 @@
 */
 
 // Default Package
-package GeneratedModelsDEVS_Suite;
+package DWLProject;
 
 import model.modeling.message;
 import view.modeling.ViewableAtomic;

@@ -7,7 +7,7 @@
 */
 
 // Default Package
-package GeneratedModelsDEVS_Suite;
+package DWLProject;
 
 import java.awt.Dimension;
 import java.awt.Point;

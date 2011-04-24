@@ -7,10 +7,12 @@
 */
 
 // Default Package
-package GeneratedModelsDEVS_Suite;
+package DWLProject;
 
 import model.modeling.message;
 import view.modeling.ViewableAtomic;
+import GenCol.Pair;
+import GenCol.Queue;
 import GenCol.entity;
 
 /**
@@ -23,30 +25,53 @@ import GenCol.entity;
  *
  */
 public class Coord_0_0 extends ViewableAtomic{
+	
+	private static final String COORD_0_0 = "Coord_0_0";
+	//Input Ports
+	private static final String START = "start";
+	private static final String FF_IN = "FFin";
+	private static final String CAT_FILE_IN = "CatFileIn";
+	private static final String LDR_DONE = "LdrDone";
+	private static final String DP_DONE = "DPDone";
 
+	//Output Ports
     private static final String GET_FF = "GetFF";
 	private static final String FF_OUT = "FFout";
 	private static final String CAT_OUT = "CatOut";
-	private static final String CAT_FILE_IN = "CatFileIn";
-	private static final String LDR_DONE = "LdrDone";
-	private static final String FF_IN = "FFin";
-	private static final String START = "start";
-	private static final String COORD_0_0 = "Coord_0_0";
+	
+	//Phases
 	private static final String PASSIVE = "passive";
-	private static final String DP_DONE = "DPDone";
-	private static final String RECEIVE_FF = "ReceiveFF";
+	private static final String DONE = "Done";
+	private static final String NOTIFY_CA = "NotifyCA";
+	private static final String RECEIVE_FF = "ReceivingFF";
+	private static final String SEND_FF = "SendingFF";
+	private static final String SEND_CAT = "SendingCats";
+	private static final String RECEIVE_CAT = "ReceivingCat";
+	private static final String QUEUEING = "QueueingCat";
 	/**
-	 * Takes 1 unit of time to notify the CommAgent
+	 * Takes 1 unit of time to queue an incoming Cat File 
 	 */
-	private double loadFileNotification = 1;
+	private double QUEUEING_TIME = 1;
 	
 	private message loadFileMessage;
+	private message partitionFileMessage;
+	private CatFile currentCatFile;
+	private Queue catFileQueue;
+	private Queue pendingCatFileQueue;
+	private Queue completedCatQueue;
+	private Queue loadersQueue;
 
-    // Add Default Constructor
+	/**
+	 * Default Constructor
+	 */
     public Coord_0_0(){
         this(COORD_0_0);    }
 
-    // Add Parameterized Constructors
+    /**
+     * Parameterized Constructor
+     * 
+     * @param name
+     */
     public Coord_0_0(String name){
         super(name);
 // Structure information start
@@ -64,34 +89,147 @@ public class Coord_0_0 extends ViewableAtomic{
 
 //add test input ports:
         addTestInput(START, new entity(START));
+        addTestInput(FF_IN, new FlatFile());
+        addTestInput(CAT_FILE_IN, new CatFile("Cat1", 10, 10));
+        addTestInput(CAT_FILE_IN, new CatFile("Cat2", 10, 20), 5);
+        addTestInput(CAT_FILE_IN, new CatFile("Cat3", 10, 10), 15);
+        addTestInput(DP_DONE, new entity(DONE));
 
 // Structure information end
         initialize();
     }
 
-    // Add initialize function
+    @Override
     public void initialize(){
         super.initialize();
         phase = PASSIVE;
         sigma = INFINITY;
+        catFileQueue = new Queue();
+        completedCatQueue = new Queue();
+        pendingCatFileQueue = new Queue();
+        loadersQueue = new Queue();
     }
 
-    // Add external transition function
+    @SuppressWarnings("unchecked")
+	@Override
     public void deltext(double e, message x){
 		Continue(e);
+		if (phaseIs(RECEIVE_CAT)) {
+			for (int i = 0; i < x.size(); i++) {
+				queueCatFile(x, i, e);
+			}
+		}
 		if (phaseIs(PASSIVE)) {
 			for (int i = 0; i < x.size(); i++) {
 				checkForStartInput(x, i);
+				checkForFlatFile(x, i);
+				checkForCatFile(x, i);
+				checkForDPDone(x, i);
 			}
 		}
-    	
-    	//TODO: passive -> FF on FFin port -> SendFF
-    	//TODO: passive -> Cat file on CAT_FILE_IN port -> ReceiveCat
-    	//TODO: passive -> done on port DPDone -> SendCAT
+		for (int i = 0; i < x.size(); i++) {
+			if (messageOnPort(x, LDR_DONE, i)) {
+				entity value = x.getValOnPort(LDR_DONE, i);
+				Pair pair = (Pair) value;
+				loadersQueue.add(pair.getKey());
+				CatFile aCatFile = (CatFile) pair.getValue();
+				completedCatQueue.add(aCatFile);
+			}
+		}
     }
 
     /**
-     * Checks if the 
+     * Checks if the <code>DataPartitioner</code> has notified is done
+     * sending files and thus 
+     * @param x
+     * @param i
+     */
+    private void checkForDPDone(message x, int i) {
+    	if (messageOnPort(x, DP_DONE, i)) {
+    		entity value = x.getValOnPort(DP_DONE, i);
+    		if (value.getName().equals(DONE)) {
+    			//TODO: prepare messages for the loaders
+    			//TODO: need to passivate afterwards??
+    			holdIn(SEND_CAT, 0);
+    		}
+    	}
+	}
+
+	/**
+     * It puts the <code>CatFile</code> in a pending queue, updates sigma
+     * and continues receiving the current <code>CatFile</code>
+     * 
+     * @param x message
+     * @param i 
+     * @param e
+     */
+    @SuppressWarnings("unchecked")
+	private void queueCatFile(message x, int i, double e) {
+		if (messageOnPort(x, CAT_FILE_IN, i)) {
+			entity value = x.getValOnPort(CAT_FILE_IN, i);
+			if (value instanceof CatFile) {
+				CatFile aCatFile = (CatFile) value;
+				currentCatFile.updateRegistrationTime(e);
+				holdIn(QUEUEING, QUEUEING_TIME);
+				pendingCatFileQueue.add(aCatFile);
+			}
+			else {
+				System.out.println("Not a Cat File: " + value.getName());
+				holdIn(PASSIVE, INFINITY);
+			}
+		}
+	}
+
+	/**
+     * Checks if a <code>CatFile</code> is in port <code>CAT_FILE_IN</code>
+     * and stores it in an internal queue that is used later on to provide work to
+     * the different <tt>loaders</tt>
+     * 
+     * @param x
+     * @param i
+     */
+    private void checkForCatFile(message x, int i) {
+		if (messageOnPort(x, CAT_FILE_IN, i)) {
+			entity value = x.getValOnPort(CAT_FILE_IN, i);
+			if (value instanceof CatFile) {
+				CatFile aCatFile = (CatFile) value;
+				holdIn(RECEIVE_CAT, aCatFile.getRegistrationTime());
+				currentCatFile = aCatFile;
+			}
+			else {
+				System.out.println("Not a Cat File: " + value.getName());
+				holdIn(PASSIVE, INFINITY);
+			}
+		}
+	}
+
+	/**
+     * Checks if the <code>FlatFile</code> is in the input port
+     * <code>FF_IN</code> and prepares to send it to the
+     * <code>FF_OUT</code> port
+     * @param x
+     * @param i
+     */
+    private void checkForFlatFile(message x, int i) {
+		partitionFileMessage = new message();
+		if (messageOnPort(x, FF_IN, i)) {
+			entity value = x.getValOnPort(FF_IN, i);
+			if (value instanceof FlatFile) {
+				FlatFile theFlatFile = (FlatFile) value;
+				partitionFileMessage.add(makeContent(FF_OUT, theFlatFile));
+				holdIn(RECEIVE_FF, theFlatFile.getRegistrationTime());
+			}
+			else {
+				System.out.println("Not a Flat File: " + value.getName());
+				holdIn(PASSIVE, INFINITY);
+			}
+		}
+	}
+
+	/**
+     * Checks for <code>START</code> on the input port <tt>start</tt>
+     * and prepares to send a message to the <code>CommAgent</code>
+     * thru the <code>GET_FF</code> port
      * @param x
      * @param i
      */
@@ -101,38 +239,67 @@ public class Coord_0_0 extends ViewableAtomic{
 			entity value = x.getValOnPort(START, i);
 			if (value.getName().equals(START)) {
 				loadFileMessage.add(makeContent(GET_FF, new entity(START)));
-				holdIn(RECEIVE_FF, loadFileNotification);
+				holdIn(NOTIFY_CA, 0);
 			}
 		}
 	}
 
-	// Add internal transition function
+    @SuppressWarnings("unchecked")
+	@Override
     public void deltint(){
-    	if (phaseIs(RECEIVE_FF)) {
+    	if (phaseIs(NOTIFY_CA)) {
     		passivateIn(PASSIVE);
     	}
-    	//TODO: ReceiveFF -> passive;
-    	//TODO: SendFF -> passive;
-    	//TODO: ReceiveCat -> passive;
-    	//TODO: SendCAT -> if no more Cat files -> passive;
+    	if (phaseIs(SEND_FF)) {
+    		passivateIn(PASSIVE);
+    	}
+    	if (phaseIs(RECEIVE_FF)) {
+    		holdIn(SEND_FF, 0);
+    	}
+    	if (phaseIs(QUEUEING)) {
+    		double timeLeftForRegistration = currentCatFile.getRegistrationTime();
+    		if (timeLeftForRegistration >= 0D) {
+    			holdIn(RECEIVE_CAT, timeLeftForRegistration);
+    		} else {
+    			currentCatFile = null;
+    			holdIn(PASSIVE, INFINITY);
+    		}
+    	}
+    	if (phaseIs(RECEIVE_CAT)) {
+			catFileQueue.add(currentCatFile);
+			if (pendingCatFileQueue.size() > 0) {
+				currentCatFile = (CatFile) pendingCatFileQueue.remove();
+				holdIn(RECEIVE_CAT, currentCatFile.getRegistrationTime());
+			} else {
+				passivateIn(PASSIVE);
+				currentCatFile = null;
+			}
+    	}
+    	if (phaseIs(SEND_CAT)) {
+    		if ((loadersQueue.isEmpty() && !catFileQueue.isEmpty()) 
+    				|| (!loadersQueue.isEmpty() && catFileQueue.isEmpty())) {
+    			passivateIn(PASSIVE);
+    		}
+    	}
     }
 
-    /**
-     * Confluent function
-     */
+    @Override
     public void deltcon(double e, message x){
     	deltint();
     	deltext(0D, x);
     }
 
-    // Add output function
+    @Override
     public message out(){
-    	if (phaseIs(RECEIVE_FF)) {
+    	if (phaseIs(NOTIFY_CA)) {
     		return loadFileMessage;
+    	}
+    	if (phaseIs(SEND_FF)) {
+    		return partitionFileMessage;
     	}
     	return new message();
     }
 
     // Add Show State function
-    }
+}
 

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package GeneratedModelsDEVS_Suite;
+package DWLProject;
 
 import GenCol.entity;
 

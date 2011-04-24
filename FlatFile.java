@@ -1,4 +1,4 @@
-package GeneratedModelsDEVS_Suite;
+package DWLProject;
 
 import GenCol.entity;
 
@@ -18,9 +18,14 @@ public class FlatFile extends entity {
 	private int numberOfRecords;
 	private int numberOfErrors;
 	private int numberOfCategories;
+	private double registrationTime;
 	
 	public FlatFile() {
 		super(FLAT_FILE_TXT);
+		this.numberOfRecords = 100;
+		this.numberOfErrors = 0;
+		this.numberOfCategories = 2;
+		this.registrationTime = 10D;
 	}
 	
 	/**
@@ -28,13 +33,15 @@ public class FlatFile extends entity {
 	 * @param numberOfRecords
 	 * @param numberOfErrors
 	 * @param numberOfCategories
+	 * @param registrationTime
 	 */
 	public FlatFile(int numberOfRecords, int numberOfErrors,
-			int numberOfCategories) {
+			int numberOfCategories, double registrationTime) {
 		super(FLAT_FILE_TXT);
 		this.numberOfRecords = numberOfRecords;
 		this.numberOfErrors = numberOfErrors;
 		this.numberOfCategories = numberOfCategories;
+		this.registrationTime = registrationTime;
 	}
 	public int getNumberOfRecords() {
 		return numberOfRecords;
@@ -54,7 +61,7 @@ public class FlatFile extends entity {
 	public void setNumberOfCategories(int numberOfCategories) {
 		this.numberOfCategories = numberOfCategories;
 	}
-	
-	
-
+	public double getRegistrationTime() {
+		return this.registrationTime;
+	}
 }

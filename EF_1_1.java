@@ -7,7 +7,7 @@
 */
 
 // Default Package
-package GeneratedModelsDEVS_Suite;
+package DWLProject;
 
 import view.modeling.ViewableAtomic;
 import view.modeling.ViewableDigraph;
