@@ -35,7 +35,12 @@ public class Coord_0_0 extends ViewableAtomic{
 	private static final String PASSIVE = "passive";
 	private static final String DP_DONE = "DPDone";
 	private static final String RECEIVE_FF = "ReceiveFF";
-	protected double processing_time;
+	/**
+	 * Takes 1 unit of time to notify the CommAgent
+	 */
+	private double loadFileNotification = 1;
+	
+	private message loadFileMessage;
 
     // Add Default Constructor
     public Coord_0_0(){
@@ -58,6 +63,7 @@ public class Coord_0_0 extends ViewableAtomic{
         addOutport(GET_FF);
 
 //add test input ports:
+        addTestInput(START, new entity(START));
 
 // Structure information end
         initialize();
@@ -73,27 +79,38 @@ public class Coord_0_0 extends ViewableAtomic{
     // Add external transition function
     public void deltext(double e, message x){
 		Continue(e);
-		for (int i = 0; i < x.size(); i++) {
-			checkForStartInput(x, i);
+		if (phaseIs(PASSIVE)) {
+			for (int i = 0; i < x.size(); i++) {
+				checkForStartInput(x, i);
+			}
 		}
     	
-    	//TODO: passive -> start on start port -> ReceiveFF
     	//TODO: passive -> FF on FFin port -> SendFF
     	//TODO: passive -> Cat file on CAT_FILE_IN port -> ReceiveCat
     	//TODO: passive -> done on port DPDone -> SendCAT
     }
 
+    /**
+     * Checks if the 
+     * @param x
+     * @param i
+     */
     private void checkForStartInput(message x, int i) {
+		loadFileMessage = new message();
 		if (messageOnPort(x, START, i)) {
 			entity value = x.getValOnPort(START, i);
 			if (value.getName().equals(START)) {
-				holdIn(RECEIVE_FF, INFINITY);
+				loadFileMessage.add(makeContent(GET_FF, new entity(START)));
+				holdIn(RECEIVE_FF, loadFileNotification);
 			}
 		}
 	}
 
 	// Add internal transition function
     public void deltint(){
+    	if (phaseIs(RECEIVE_FF)) {
+    		passivateIn(PASSIVE);
+    	}
     	//TODO: ReceiveFF -> passive;
     	//TODO: SendFF -> passive;
     	//TODO: ReceiveCat -> passive;
@@ -110,7 +127,10 @@ public class Coord_0_0 extends ViewableAtomic{
 
     // Add output function
     public message out(){
-    	return null;
+    	if (phaseIs(RECEIVE_FF)) {
+    		return loadFileMessage;
+    	}
+    	return new message();
     }
 
     // Add Show State function
