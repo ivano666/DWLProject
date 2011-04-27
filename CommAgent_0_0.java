@@ -9,13 +9,29 @@
 // Default Package
 package DWLProject;
 
+import GenCol.entity;
 import model.modeling.message;
 import view.modeling.ViewableAtomic;
 
 public class CommAgent_0_0 extends ViewableAtomic{
 
     protected double processing_time;
-
+    
+    private message loadFileMessage;
+    
+  //Phases
+	private static final String PASSIVE = "passive";
+	private static final String START = "start";
+	private static final String RECEIVE_FF = "Receive";
+	private static final String SEND_FF = "Send";
+	
+	//Input Ports
+	private static final String FF_IN = "FFin";
+	//Output Ports
+	private static final String FF_OUT = "FFout";
+	
+	
+	//private static final String DONE = "Done";
     // Add Default Constructor
     public CommAgent_0_0(){
         this("CommAgent_0_0");    }
@@ -40,16 +56,71 @@ public class CommAgent_0_0 extends ViewableAtomic{
     // Add initialize function
     public void initialize(){
         super.initialize();
-        phase = "passive";
+        phase = PASSIVE;
         sigma = INFINITY;
     }
 
     // Add external transition function
     public void deltext(double e, message x){
+    	Continue(e);
+    	if (phaseIs(PASSIVE)) {
+			for (int i = 0; i < x.size(); i++) {
+				checkForStartInput(x, i);
+			}
+    	} else{
+        	if (phaseIs(RECEIVE_FF)) {
+    			for (int i = 0; i < x.size(); i++) {
+    				checkForFlatFile(x, i);
+    			}
+        	}
+    	}
     }
 
+	/**
+     * Checks for <code>START</code> on the input port <tt>start</tt>
+     * and prepares to send a message to the <code>CommAgent</code>
+     * thru the <code>GET_FF</code> port
+     * @param x
+     * @param i
+     */
+    private void checkForStartInput(message x, int i) {
+		
+		if (messageOnPort(x, START, i)) {
+			entity value = x.getValOnPort(START, i);
+			if (value.getName().equals(START)) {
+				holdIn(RECEIVE_FF, 5);
+			}
+		}
+	}
+	/**
+     * Checks if the <code>FlatFile</code> is in the input port
+     * <code>FF_IN</code> and prepares to send it to the
+     * <code>FF_OUT</code> port
+     * @param x
+     * @param i
+     */
+    private void checkForFlatFile(message x, int i) {
+    	loadFileMessage = new message();
+		if (messageOnPort(x, FF_IN, i)) {
+			entity value = x.getValOnPort(FF_IN, i);
+			if (value instanceof FlatFile) {
+				FlatFile theFlatFile = (FlatFile) value;
+				loadFileMessage.add(makeContent(FF_OUT, theFlatFile));
+				//holdIn(RECEIVE_FF, theFlatFile.getRegistrationTime());
+				holdIn(SEND_FF, 1);
+			}
+		//	else {
+		//		System.out.println("Not a Flat File: " + value.getName());
+		//		holdIn(PASSIVE, INFINITY);
+		//	}
+		}
+	}
+    
     // Add internal transition function
     public void deltint(){
+    	if (phaseIs(SEND_FF)){
+        		passivate();
+    	};
     }
 
     // Add confluent function
@@ -58,6 +129,9 @@ public class CommAgent_0_0 extends ViewableAtomic{
 
     // Add output function
     public message out(){
+    	if(phaseIs(SEND_FF)){
+    		return loadFileMessage;
+    	}else
     	return null;
     }
 

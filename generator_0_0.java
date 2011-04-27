@@ -28,8 +28,16 @@ public class generator_0_0 extends ViewableAtomic{
   protected int records = 1000;
   protected int errors = 0;
   protected int categories = 5;
+  
+  
 
-  public generator_0_0() {this("generator", 10);}
+//Phases
+	private static final String PASSIVE = "passive";
+	private static final String READY = "ready";
+	private static final String START_DW = "startingDW";
+	private static final String SEND_FF = "sendingFF";
+	
+  public generator_0_0() {this("generator", 1);}
 
 public generator_0_0(String name,double Int_arr_time){
    super(name);
@@ -45,7 +53,7 @@ public generator_0_0(String name,double Int_arr_time){
 }
 
 public void initialize(){
-   holdIn("passive", 30);
+   holdIn(READY, 1);
 
    //   phase = "passive";
    //  sigma = INFINITY;
@@ -69,6 +77,7 @@ Continue(e);
 
 public void  deltint( )
 {
+
 /*
 System.out.println(name+" deltint count "+count);
 System.out.println(name+" deltint int_arr_time "+int_arr_time);
@@ -78,12 +87,17 @@ System.out.println(name+" deltint tN "+tN);
 
 
 
-	if(phaseIs("passive")){
+	if(phaseIs(READY)){
    //count = count +1;
-   holdIn("createFF",int_arr_time);
+   //holdIn("StartDW",int_arr_time);
+		holdIn(START_DW,1);
 }
 else 
-	if (phaseIs("createFF")){
+	if (phaseIs(START_DW)){
+		holdIn(SEND_FF,0);
+	}
+	else
+	if (phaseIs(SEND_FF)){
 		
 		passivate();
 	};
@@ -95,11 +109,11 @@ public message  out( )
 //System.out.println(name+" out count "+count);
 
    message  m = new message();
-   if (phaseIs("passive")){
+   if (phaseIs(READY)){
 	   content con = makeContent("start",new entity("start"));
 	   m.add(con);
    } else
-	   if (phaseIs("createFF")){
+	   if (phaseIs(SEND_FF)){
 		   FlatFile ff = new FlatFile();
 		   ff.setNumberOfRecords(records);
 		   ff.setNumberOfErrors(errors);
