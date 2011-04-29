@@ -10,13 +10,14 @@
 package DWLProject;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
-import GenCol.Pair;
-import GenCol.entity;
 import model.modeling.content;
 import model.modeling.message;
 import view.modeling.ViewableAtomic;
+import GenCol.Pair;
+import GenCol.entity;
 
 public class Loader_0_0 extends ViewableAtomic {
 	private static final message NULL_MESSAGE = new message();
@@ -58,9 +59,12 @@ public class Loader_0_0 extends ViewableAtomic {
 		addOutport(INSERT);
 
 		// add test input ports:
-		CatFile someFile = new CatFile("Cat1", 10, 10, 3, 1, 2011);
+		CatFile someFile = new CatFile("Cat1", 10, 10, 3, 1, 1);
 		Pair aPair = new Pair(getName(), someFile);
         addTestInput(CAT_IN, aPair);
+		someFile = new CatFile("Cat2", 10, 10, 3, 1, 2);
+		aPair = new Pair(getName(), someFile);
+		addTestInput(CAT_IN, aPair);
 
 		// Structure information end
 		initialize();
@@ -148,12 +152,35 @@ public class Loader_0_0 extends ViewableAtomic {
 		List<ExtCatFile> theFiles = new ArrayList<ExtCatFile>(currentCatFile.getNumberOfSummaryLevels()); 
 		for (int i = 1; i <= currentCatFile.getNumberOfSummaryLevels(); i++) {
 			String summaryLevel = SUMMARY_LEVEL_PREFIX+i;
-			String name = currentCatFile.getName()+summaryLevel+currentCatFile.getYear();
-			ExtCatFile aFile = new ExtCatFile(name, 
-					currentCatFile.getNumberOfRecords(), summaryLevel, currentCatFile.getYear());
-			theFiles.add(aFile);
+			int[] years = getYears(currentCatFile.getYears());
+			for (int j = 0; j < years.length; j++) {
+				String name = currentCatFile.getName()+summaryLevel+years[j];
+				ExtCatFile aFile = new ExtCatFile(name, 
+						currentCatFile.getNumberOfRecords(), summaryLevel, years[j]);
+				theFiles.add(aFile);
+			}
 		}
 		return theFiles;
+	}
+
+	/**
+	 * Builds the array of years based on the number of years. 
+	 * The assumption is to start with today's year and go
+	 * backwards.
+	 * 
+	 * @param numberOfYears
+	 * @return
+	 */
+	private int[] getYears(int numberOfYears) {
+		int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+		int[] yearsArray = null;
+		if (numberOfYears > 0) {
+			yearsArray = new int[numberOfYears];
+			for (int i = 0; i < yearsArray.length; i++) {
+				yearsArray[i] = currentYear - i;
+			}
+		}
+		return yearsArray;
 	}
 
 	@Override
