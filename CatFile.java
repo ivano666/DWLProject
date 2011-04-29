@@ -22,25 +22,35 @@ public class CatFile extends entity {
 	private int numberOfRecords;
 	private double completeRegistrationTime;
 	private double registrationTime;
+	private int numberOfDimensions;
+	private int numberOfSummaryLevels;
+	private int year;
 	
 	/**
 	 * Default Constructor
 	 */
 	public CatFile() {
-		this(CAT1, DEFAULT_NUMBER_OF_RECORDS, DEFAULT_REGISTRATION_TIME);
+		this(CAT1, DEFAULT_NUMBER_OF_RECORDS, DEFAULT_REGISTRATION_TIME, 3, 1, 2011);
 	}
 
 	/**
 	 * Parameterized constructor
 	 * 
 	 * @param name
+	 * @param numberOfRecords
 	 * @param registrationTime
+	 * @param dimensions
+	 * @param summaryLevel
+	 * @param year
 	 */
-	public CatFile(String name, int numberOfRecords, double registrationTime) {
+	public CatFile(String name, int numberOfRecords, double registrationTime, int dimensions, int summaryLevels, int year) {
 		super(name);
 		this.numberOfRecords = numberOfRecords;
 		this.registrationTime = registrationTime;
 		this.completeRegistrationTime = registrationTime;
+		this.numberOfDimensions = dimensions;
+		this.numberOfSummaryLevels = summaryLevels;
+		this.year = year;
 	}
 
 	public int getNumberOfRecords() {
@@ -57,5 +67,14 @@ public class CatFile extends entity {
 	}
 	public double getCompleteRegistrationTime() {
 		return completeRegistrationTime;
+	}
+	public int getNumberOfDimensions() {
+		return numberOfDimensions;
+	}
+	public int getNumberOfSummaryLevels() {
+		return numberOfSummaryLevels;
+	}
+	public int getYear() {
+		return year;
 	}
 }
