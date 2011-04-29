@@ -37,7 +37,7 @@ public class LoaderManager {
 		List<Loader_0_0> theLoaders = createLoaders(numberOfLoaders);
 		for(Loader_0_0 loader : theLoaders) {
 			addLoaderToSystem(loader, coord);
-		}
+		} 
 		return theLoaders;
 	}
 	/**
