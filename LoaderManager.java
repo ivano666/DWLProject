@@ -18,6 +18,7 @@ import view.modeling.ViewableAtomic;
  */
 public class LoaderManager {
 	
+	private static final String LOAD = "load";
 	private static final String LOADER = "Loader_1_";
 
 	private LoaderManager() {
@@ -70,7 +71,7 @@ public class LoaderManager {
 			coordinator.addModel(aLoader);
 			coordinator.addCoupling(coordinator.getName(), Coord_0_0.getCatOut(), aLoader.getName(), Loader_0_0.getCatIn());
 			coordinator.addCoupling(aLoader.getName(), Loader_0_0.getDone(), coordinator.getName(), Coord_0_0.getLdrDone());
-			coordinator.addCoupling(aLoader.getName(), Loader_0_0.getInsert(), theParent.getName(), Loader_0_0.getInsert());
+			coordinator.addCoupling(aLoader.getName(), Loader_0_0.getExtCatOut(), theParent.getName(), LOAD);
 		}
 	} 
 
