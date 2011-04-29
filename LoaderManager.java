@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
+import model.modeling.IODevs;
 import view.modeling.ViewableAtomic;
 
 /**
@@ -63,11 +64,14 @@ public class LoaderManager {
 	 * @param coordinator
 	 */
 	private static void addLoaderToSystem(Loader_0_0 aLoader, ViewableAtomic coordinator) {
-		DWL_1_1 theParent = (DWL_1_1) coordinator.getParent();
-		coordinator.addModel(aLoader);
-		coordinator.addCoupling(coordinator.getName(), Coord_0_0.getCatOut(), aLoader.getName(), Loader_0_0.getCatIn());
-		coordinator.addCoupling(aLoader.getName(), Loader_0_0.getDone(), coordinator.getName(), Coord_0_0.getLdrDone());
-		coordinator.addCoupling(aLoader.getName(), Loader_0_0.getInsert(), theParent.getName(), Loader_0_0.getInsert());
+		IODevs aDevs = coordinator.getParent();
+		if (aDevs instanceof DWL_1_1) {
+			DWL_1_1 theParent = (DWL_1_1) aDevs; 
+			coordinator.addModel(aLoader);
+			coordinator.addCoupling(coordinator.getName(), Coord_0_0.getCatOut(), aLoader.getName(), Loader_0_0.getCatIn());
+			coordinator.addCoupling(aLoader.getName(), Loader_0_0.getDone(), coordinator.getName(), Coord_0_0.getLdrDone());
+			coordinator.addCoupling(aLoader.getName(), Loader_0_0.getInsert(), theParent.getName(), Loader_0_0.getInsert());
+		}
 	} 
 
 }

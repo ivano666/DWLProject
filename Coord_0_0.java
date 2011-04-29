@@ -26,6 +26,7 @@ import GenCol.entity;
  */
 public class Coord_0_0 extends ViewableAtomic{
 	
+	private static final message NULL_MESSAGE = new message();
 	private static final String COORD_0_0 = "Coord_0_0";
 	//Input Ports
 	private static final String START = "start";
@@ -53,13 +54,15 @@ public class Coord_0_0 extends ViewableAtomic{
 	 */
 	private double QUEUEING_TIME = 1;
 	
-	private message loadFileMessage;
-	private message partitionFileMessage;
 	private CatFile currentCatFile;
 	private Queue catFileQueue;
 	private Queue pendingCatFileQueue;
 	private Queue completedCatQueue;
 	private Queue loadersQueue;
+	private message loadFileMessage;
+	private message partitionFileMessage;
+	private message catFilesOutMessage;
+	private boolean doneDPReceived;
 
 	/**
 	 * Default Constructor
@@ -99,7 +102,6 @@ public class Coord_0_0 extends ViewableAtomic{
         initialize();
     }
 
-    @SuppressWarnings("unchecked")
 	@Override
     public void initialize(){
         super.initialize();
@@ -109,6 +111,9 @@ public class Coord_0_0 extends ViewableAtomic{
         completedCatQueue = new Queue();
         pendingCatFileQueue = new Queue();
         loadersQueue = new Queue();
+        currentCatFile = null;
+        loadFileMessage = null;
+        partitionFileMessage = null;
     }
 
     @SuppressWarnings("unchecked")
@@ -120,13 +125,11 @@ public class Coord_0_0 extends ViewableAtomic{
 				queueCatFile(x, i, e);
 			}
 		}
-		if (phaseIs(PASSIVE)) {
-			for (int i = 0; i < x.size(); i++) {
-				checkForStartInput(x, i);
-				checkForFlatFile(x, i);
-				checkForCatFile(x, i);
-				checkForDPDone(x, i);
-			}
+		for (int i = 0; i < x.size(); i++) {
+			checkForStartInput(x, i);
+			checkForFlatFile(x, i);
+			checkForCatFile(x, i);
+			checkForDPDone(x, i);
 		}
 		for (int i = 0; i < x.size(); i++) {
 			if (messageOnPort(x, LDR_DONE, i)) {
@@ -137,6 +140,10 @@ public class Coord_0_0 extends ViewableAtomic{
 				completedCatQueue.add(aCatFile);
 			}
 		}
+    	if (phaseIs(PASSIVE) && doneDPReceived) {
+    		holdIn(SEND_CAT, 1);
+    		sendCatFilesToLoaders();
+    	}
     }
 
     /**
@@ -146,19 +153,25 @@ public class Coord_0_0 extends ViewableAtomic{
      * @param i
      */
     private void checkForDPDone(message x, int i) {
-    	if (messageOnPort(x, DP_DONE, i)) {
-    		entity value = x.getValOnPort(DP_DONE, i);
-    		if (value.getName().equals(DONE)) {
-    			holdIn(SEND_CAT, 0);
-    			sendCatFilesToLoaders();
-    		}
-    	}
+		if (messageOnPort(x, DP_DONE, i)) {
+			entity value = x.getValOnPort(DP_DONE, i);
+			if (value.getName().equals(DONE)) {
+				doneDPReceived = true;
+			}
+		}
 	}
 
     /**
-     * Creates the messages for the 
+     * Creates the messages for the loaders 
      */
 	private void sendCatFilesToLoaders() {
+		catFilesOutMessage = new message();
+		while (!loadersQueue.isEmpty() && !catFileQueue.isEmpty()) {
+			Loader_0_0 aLoader = (Loader_0_0)loadersQueue.remove();
+			CatFile aCatFile = (CatFile) catFileQueue.remove();
+			Pair aPair = new Pair(aLoader.getName(), aCatFile);
+			catFilesOutMessage.add(makeContent(CAT_OUT, aPair));
+		}
 	}
 
 	/**
@@ -194,19 +207,23 @@ public class Coord_0_0 extends ViewableAtomic{
      * @param x
      * @param i
      */
-    private void checkForCatFile(message x, int i) {
-		if (messageOnPort(x, CAT_FILE_IN, i)) {
-			entity value = x.getValOnPort(CAT_FILE_IN, i);
-			if (value instanceof CatFile) {
-				CatFile aCatFile = (CatFile) value;
-				holdIn(RECEIVE_CAT, aCatFile.getRegistrationTime());
-				currentCatFile = aCatFile;
-			}
-			else {
-				System.out.println("Not a Cat File: " + value.getName());
-				holdIn(PASSIVE, INFINITY);
-			}
-		}
+    @SuppressWarnings("unchecked")
+	private void checkForCatFile(message x, int i) {
+    	if (phaseIs(PASSIVE)) {
+    		if (messageOnPort(x, CAT_FILE_IN, i)) {
+    			entity value = x.getValOnPort(CAT_FILE_IN, i);
+    			if (value instanceof CatFile) {
+    				CatFile aCatFile = (CatFile) value;
+    				holdIn(RECEIVE_CAT, aCatFile.getRegistrationTime());
+    				currentCatFile = aCatFile;
+    				catFileQueue.add(currentCatFile);
+    			}
+    			else {
+    				System.out.println("Not a Cat File: " + value.getName());
+    				holdIn(PASSIVE, INFINITY);
+    			}
+    		}
+    	}
 	}
 
 	/**
@@ -217,17 +234,19 @@ public class Coord_0_0 extends ViewableAtomic{
      * @param i
      */
     private void checkForFlatFile(message x, int i) {
-		partitionFileMessage = new message();
-		if (messageOnPort(x, FF_IN, i)) {
-			entity value = x.getValOnPort(FF_IN, i);
-			if (value instanceof FlatFile) {
-				FlatFile theFlatFile = (FlatFile) value;
-				partitionFileMessage.add(makeContent(FF_OUT, theFlatFile));
-				holdIn(RECEIVE_FF, theFlatFile.getRegistrationTime());
-			}
-			else {
-				System.out.println("Not a Flat File: " + value.getName());
-				holdIn(PASSIVE, INFINITY);
+		if (phaseIs(PASSIVE)) {
+			if (messageOnPort(x, FF_IN, i)) {
+				entity value = x.getValOnPort(FF_IN, i);
+				if (value instanceof FlatFile) {
+					FlatFile theFlatFile = (FlatFile) value;
+					partitionFileMessage = new message();
+					partitionFileMessage.add(makeContent(FF_OUT, theFlatFile));
+					holdIn(RECEIVE_FF, theFlatFile.getRegistrationTime());
+				}
+				else {
+					System.out.println("Not a Flat File: " + value.getName());
+					holdIn(PASSIVE, INFINITY);
+				}
 			}
 		}
 	}
@@ -240,17 +259,19 @@ public class Coord_0_0 extends ViewableAtomic{
      * @param i
      */
 	private void checkForStartInput(message x, int i) {
-		loadFileMessage = new message();
-		if (messageOnPort(x, START, i)) {
-			entity value = x.getValOnPort(START, i);
-			if (value.getName().equals(START)) {
-				holdIn(NOTIFY_CA, 0);
-				loadFileMessage.add(makeContent(GET_FF, new entity(START)));
+		if (phaseIs(PASSIVE)) {
+			if (messageOnPort(x, START, i)) {
+				entity value = x.getValOnPort(START, i);
+				if (value.getName().equals(START)) {
+					holdIn(NOTIFY_CA, 0);
+					loadFileMessage = new message();
+					loadFileMessage.add(makeContent(GET_FF, new entity(START)));
+				}
 			}
 		}
 	}
 
-    @SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked")
 	@Override
     public void deltint(){
     	if (phaseIs(NOTIFY_CA)) {
@@ -272,9 +293,9 @@ public class Coord_0_0 extends ViewableAtomic{
     		}
     	}
     	if (phaseIs(RECEIVE_CAT)) {
-			catFileQueue.add(currentCatFile);
 			if (pendingCatFileQueue.size() > 0) {
 				currentCatFile = (CatFile) pendingCatFileQueue.remove();
+				catFileQueue.add(currentCatFile);
 				holdIn(RECEIVE_CAT, currentCatFile.getRegistrationTime());
 			} else {
 				passivateIn(PASSIVE);
@@ -282,9 +303,10 @@ public class Coord_0_0 extends ViewableAtomic{
 			}
     	}
     	if (phaseIs(SEND_CAT)) {
-    		if ((loadersQueue.isEmpty() && !catFileQueue.isEmpty()) 
-    				|| (!loadersQueue.isEmpty() && catFileQueue.isEmpty())) {
+    		if (catFileQueue.size() == completedCatQueue.size()) {
     			passivateIn(PASSIVE);
+    		} else {
+    			sendCatFilesToLoaders();
     		}
     	}
     }
@@ -295,7 +317,8 @@ public class Coord_0_0 extends ViewableAtomic{
     	deltext(0D, x);
     }
 
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public message out(){
     	if (phaseIs(NOTIFY_CA)) {
 			loadersQueue.addAll(LoaderManager.addLoadersToSystem(2, this));
@@ -304,7 +327,10 @@ public class Coord_0_0 extends ViewableAtomic{
     	if (phaseIs(SEND_FF)) {
     		return partitionFileMessage;
     	}
-    	return new message();
+    	if (phaseIs(SEND_CAT)) {
+    		return catFilesOutMessage;
+    	}
+    	return NULL_MESSAGE;
     }
 
     /**
@@ -318,6 +344,25 @@ public class Coord_0_0 extends ViewableAtomic{
 		return LDR_DONE;
 	}
 
-    // Add Show State function
+	@Override
+	public void showState() {
+		super.showState();
+		System.out.println("The CatFile Queue has " + catFileQueue.size() + " elements");
+		System.out.println("The Queue contains: " + catFileQueue);
+		System.out.println("The Loaders Queue has " + loadersQueue.size() + " elements");
+		System.out.println("The Queue contains: " + loadersQueue);
+	}
+	
+	@Override
+	public String getTooltipText() {
+		StringBuilder myBuilder = new StringBuilder();
+		myBuilder.append("\n");
+		myBuilder.append("Loaders Queue: ");
+		myBuilder.append(loadersQueue);
+		myBuilder.append("\n");
+		myBuilder.append("Cat File Queue: ");
+		myBuilder.append(catFileQueue);
+		return super.getTooltipText() + myBuilder.toString();
+	}
 }
 

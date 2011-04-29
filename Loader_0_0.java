@@ -58,7 +58,9 @@ public class Loader_0_0 extends ViewableAtomic {
 		addOutport(INSERT);
 
 		// add test input ports:
-        addTestInput(CAT_IN, new CatFile("Cat1", 10, 10, 3, 1, 2011));
+		CatFile someFile = new CatFile("Cat1", 10, 10, 3, 1, 2011);
+		Pair aPair = new Pair(getName(), someFile);
+        addTestInput(CAT_IN, aPair);
 
 		// Structure information end
 		initialize();
@@ -94,13 +96,18 @@ public class Loader_0_0 extends ViewableAtomic {
     private void checkForCatFile(message x, int i) {
 		if (messageOnPort(x, CAT_IN, i)) {
 			entity value = x.getValOnPort(CAT_IN, i);
-			if (value instanceof CatFile) {
-				currentCatFile = (CatFile) value;
-				holdIn(BUSY, currentCatFile.getRegistrationTime());
-			}
-			else {
-				System.out.println("Not a Cat File: " + value.getName());
-				holdIn(PASSIVE, INFINITY);
+			if (value instanceof Pair) {
+				Pair aPair = (Pair) value;
+				if (aPair.getKey().equals(this.getName())) {
+					if (aPair.getValue() instanceof CatFile) {
+						currentCatFile = (CatFile) aPair.getValue();
+						holdIn(BUSY, currentCatFile.getRegistrationTime());
+					}
+					else {
+						System.out.println("Not a Cat File: " + value.getName());
+						holdIn(PASSIVE, INFINITY);
+					}
+				}
 			}
 		}
 	}
