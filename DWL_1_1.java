@@ -17,9 +17,13 @@ import view.modeling.ViewableDigraph;
 
 public class DWL_1_1 extends ViewableDigraph{
 
+	//In ports
     private static final String START = "start";
 	private static final String FF_IN = "FFin";
-	private static final String INSERT = "insert";
+	
+	//Out ports
+	private static final String LOAD = "load";
+	private static final String ERROR_FILE = "ErrorFile";
 
 	// Add Default Constructor
     public DWL_1_1(){
@@ -36,7 +40,8 @@ public class DWL_1_1 extends ViewableDigraph{
         addInport(FF_IN);
 
         // Add output port names
-        addOutport(INSERT);
+        addOutport(LOAD);
+        addOutport(ERROR_FILE);
 
         //add test input ports:
 
@@ -70,9 +75,9 @@ public class DWL_1_1 extends ViewableDigraph{
     {
         preferredSize = new Dimension(693, 470);
         ((ViewableComponent)withName("CommAgent")).setPreferredLocation(new Point(3, 48));
-        ((ViewableComponent)withName("DataPartitioner")).setPreferredLocation(new Point(1, 385));
         ((ViewableComponent)withName("Coordinator")).setPreferredLocation(new Point(77, 207));
-        ((ViewableComponent)withName("Loader_1_2")).setPreferredLocation(new Point(364, 209));
-        ((ViewableComponent)withName("Loader_1_1")).setPreferredLocation(new Point(363, 366));
+        ((ViewableComponent)withName("DataPartitioner")).setPreferredLocation(new Point(1, 385));
+        ((ViewableComponent)withName("Loader_1_2")).setPreferredLocation(new Point(352, 331));
+        ((ViewableComponent)withName("Loader_1_1")).setPreferredLocation(new Point(341, 156));
     }
 }
