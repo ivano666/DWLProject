@@ -24,7 +24,7 @@ public class Loader_0_0 extends ViewableAtomic {
 
 	private static final String SUMMARY_LEVEL_PREFIX = "L";
 	//Output ports
-	private static final String INSERT = "insert";
+	private static final String EXT_CAT_OUT = "extcatout";
 	private static final String DONE = "done";
 	
 	//Input ports
@@ -56,7 +56,7 @@ public class Loader_0_0 extends ViewableAtomic {
 
 		// Add output port names
 		addOutport(DONE);
-		addOutport(INSERT);
+		addOutport(EXT_CAT_OUT);
 
 		// add test input ports:
 		CatFile someFile = new CatFile("Cat1", 10, 10, 3, 1, 1);
@@ -136,7 +136,7 @@ public class Loader_0_0 extends ViewableAtomic {
 	private void prepareOutput(List<ExtCatFile> theFiles) {
 		outputMessage = new message();
 		for (ExtCatFile aFile : theFiles) {
-			outputMessage.add(makeContent(INSERT, aFile));
+			outputMessage.add(makeContent(EXT_CAT_OUT, aFile));
 		}
 		Pair thePair = new Pair(DONE, currentCatFile);
 		content theContent = makeContent(DONE, thePair);
@@ -216,8 +216,8 @@ public class Loader_0_0 extends ViewableAtomic {
 	/**
 	 * @return <code>INSERT</code> port
 	 */
-	public static String getInsert() {
-		return INSERT;
+	public static String getExtCatOut() {
+		return EXT_CAT_OUT;
 	}
 
 	// Add Show State function
