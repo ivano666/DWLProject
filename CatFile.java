@@ -43,7 +43,11 @@ public class CatFile extends entity {
 	 * @param summaryLevel
 	 * @param years
 	 */
+<<<<<<< HEAD
 	public CatFile(String name, int numberOfRecords, double completeRegistrationTime, int dimensions, int summaryLevels, int years) {
+=======
+	public CatFile(String name, int numberOfRecords, double registrationTime, int dimensions, int summaryLevels, int years) {
+>>>>>>> upstream/master
 		super(name);
 		this.numberOfRecords = numberOfRecords;
 		this.completeRegistrationTime = completeRegistrationTime;
