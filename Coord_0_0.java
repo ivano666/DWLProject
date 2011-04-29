@@ -90,16 +90,17 @@ public class Coord_0_0 extends ViewableAtomic{
 //add test input ports:
         addTestInput(START, new entity(START));
         addTestInput(FF_IN, new FlatFile());
-        addTestInput(CAT_FILE_IN, new CatFile("Cat1", 10, 10));
-        addTestInput(CAT_FILE_IN, new CatFile("Cat2", 10, 20), 5);
-        addTestInput(CAT_FILE_IN, new CatFile("Cat3", 10, 10), 15);
+        addTestInput(CAT_FILE_IN, new CatFile("Cat1", 10, 10, 3, 1, 2011));
+        addTestInput(CAT_FILE_IN, new CatFile("Cat2", 10, 20, 2, 1, 2011), 5);
+        addTestInput(CAT_FILE_IN, new CatFile("Cat3", 10, 10, 5, 1, 2011), 15);
         addTestInput(DP_DONE, new entity(DONE));
 
 // Structure information end
         initialize();
     }
 
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public void initialize(){
         super.initialize();
         phase = PASSIVE;
@@ -148,11 +149,16 @@ public class Coord_0_0 extends ViewableAtomic{
     	if (messageOnPort(x, DP_DONE, i)) {
     		entity value = x.getValOnPort(DP_DONE, i);
     		if (value.getName().equals(DONE)) {
-    			//TODO: prepare messages for the loaders
-    			//TODO: need to passivate afterwards??
     			holdIn(SEND_CAT, 0);
+    			sendCatFilesToLoaders();
     		}
     	}
+	}
+
+    /**
+     * Creates the messages for the 
+     */
+	private void sendCatFilesToLoaders() {
 	}
 
 	/**
@@ -233,13 +239,13 @@ public class Coord_0_0 extends ViewableAtomic{
      * @param x
      * @param i
      */
-    private void checkForStartInput(message x, int i) {
+	private void checkForStartInput(message x, int i) {
 		loadFileMessage = new message();
 		if (messageOnPort(x, START, i)) {
 			entity value = x.getValOnPort(START, i);
 			if (value.getName().equals(START)) {
-				loadFileMessage.add(makeContent(GET_FF, new entity(START)));
 				holdIn(NOTIFY_CA, 0);
+				loadFileMessage.add(makeContent(GET_FF, new entity(START)));
 			}
 		}
 	}
@@ -292,6 +298,7 @@ public class Coord_0_0 extends ViewableAtomic{
     @Override
     public message out(){
     	if (phaseIs(NOTIFY_CA)) {
+			loadersQueue.addAll(LoaderManager.addLoadersToSystem(2, this));
     		return loadFileMessage;
     	}
     	if (phaseIs(SEND_FF)) {
@@ -299,6 +306,17 @@ public class Coord_0_0 extends ViewableAtomic{
     	}
     	return new message();
     }
+
+    /**
+     * @return <code>CAT_OUT</code> port
+     */
+	public static String getCatOut() {
+		return CAT_OUT;
+	}
+
+	public static String getLdrDone() {
+		return LDR_DONE;
+	}
 
     // Add Show State function
 }

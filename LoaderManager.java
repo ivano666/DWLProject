@@ -1,7 +1,10 @@
 package DWLProject;
 
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
+
+import view.modeling.ViewableAtomic;
 
 /**
  * LoaderManager.java
@@ -28,7 +31,7 @@ public class LoaderManager {
 	 * @param coord
 	 * @return
 	 */
-	public static List<Loader_0_0> addLoadersToSystem(int numberOfLoaders, Coord_0_0 coord) {
+	public static List<Loader_0_0> addLoadersToSystem(int numberOfLoaders, ViewableAtomic coord) {
 		List<Loader_0_0> theLoaders = createLoaders(numberOfLoaders);
 		for(Loader_0_0 loader : theLoaders) {
 			addLoaderToSystem(loader, coord);
@@ -44,7 +47,9 @@ public class LoaderManager {
 	private static List<Loader_0_0> createLoaders(int numberOfLoaders) {
 		List<Loader_0_0> theList = new ArrayList<Loader_0_0>(numberOfLoaders);
 		for (int i=0 ; i < numberOfLoaders; i++) {
-			theList.add(new Loader_0_0(LOADER + (i+1)));
+			Loader_0_0 aLoader = new Loader_0_0(LOADER + (i+1));
+			aLoader.setPreferredLocation(new Point(100, 80));
+			theList.add(aLoader);
 		}
 		return theList;
 	}
@@ -57,13 +62,12 @@ public class LoaderManager {
 	 * @param aLoader
 	 * @param coordinator
 	 */
-	private static void addLoaderToSystem(Loader_0_0 aLoader, Coord_0_0 coordinator) {
+	private static void addLoaderToSystem(Loader_0_0 aLoader, ViewableAtomic coordinator) {
 		DWL_1_1 theParent = (DWL_1_1) coordinator.getParent();
-		theParent.add(aLoader);
-		theParent.addCoupling(coordinator, Coord_0_0.getCatOut(), aLoader, Loader_0_0.getCatIn());
-		theParent.addCoupling(aLoader, Loader_0_0.getDone(), coordinator, Coord_0_0.getLdrDone());
-		theParent.addCoupling(aLoader, Loader_0_0.getInsert(), theParent, Loader_0_0.getInsert());
-		
+		coordinator.addModel(aLoader);
+		coordinator.addCoupling(coordinator.getName(), Coord_0_0.getCatOut(), aLoader.getName(), Loader_0_0.getCatIn());
+		coordinator.addCoupling(aLoader.getName(), Loader_0_0.getDone(), coordinator.getName(), Coord_0_0.getLdrDone());
+		coordinator.addCoupling(aLoader.getName(), Loader_0_0.getInsert(), theParent.getName(), Loader_0_0.getInsert());
 	} 
 
 }

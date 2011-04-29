@@ -12,7 +12,9 @@ package DWLProject;
 import java.util.ArrayList;
 import java.util.List;
 
+import GenCol.Pair;
 import GenCol.entity;
+import model.modeling.content;
 import model.modeling.message;
 import view.modeling.ViewableAtomic;
 
@@ -125,7 +127,9 @@ public class Loader_0_0 extends ViewableAtomic {
 		for (ExtCatFile aFile : theFiles) {
 			outputMessage.add(makeContent(INSERT, aFile));
 		}
-		outputMessage.add(makeContent(DONE, new entity(DONE)));
+		Pair thePair = new Pair(DONE, currentCatFile);
+		content theContent = makeContent(DONE, thePair);
+		outputMessage.add(theContent);
 	}
 
 	/**

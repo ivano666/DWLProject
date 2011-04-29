@@ -75,8 +75,8 @@ public class DW_1_1 extends ViewableDigraph{
     {
         preferredSize = new Dimension(446, 471);
         ((ViewableComponent)withName("Cube_2_0")).setPreferredLocation(new Point(100, 114));
-        ((ViewableComponent)withName("Cube_1_0")).setPreferredLocation(new Point(88, 36));
         ((ViewableComponent)withName("CubeCoord_1_0")).setPreferredLocation(new Point(-47, 150));
+        ((ViewableComponent)withName("Cube_1_0")).setPreferredLocation(new Point(88, 36));
         ((ViewableComponent)withName("Cube_3_0")).setPreferredLocation(new Point(101, 202));
         ((ViewableComponent)withName("Cube_4_0")).setPreferredLocation(new Point(106, 295));
     }

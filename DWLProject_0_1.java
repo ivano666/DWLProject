@@ -45,7 +45,6 @@ public class DWLProject_0_1 extends ViewableDigraph{
 
         // Add Couplings
         addCoupling(DWL_1_1, "insert", DW_1_1, "insert");
-        addCoupling(DWL_1_1, "update", DW_1_1, "update");
         addCoupling(EF_1_1, "FFout", DWL_1_1, "FFin");
         addCoupling(EF_1_1, "start", DWL_1_1, "start");
 
@@ -59,9 +58,9 @@ public class DWLProject_0_1 extends ViewableDigraph{
      */
     public void layoutForSimView()
     {
-        preferredSize = new Dimension(1618, 543);
-        ((ViewableComponent)withName("DW_1_1")).setPreferredLocation(new Point(1139, 40));
-        ((ViewableComponent)withName("DWL_1_1")).setPreferredLocation(new Point(400, 42));
+        preferredSize = new Dimension(1618, 560);
         ((ViewableComponent)withName("EF_1_1")).setPreferredLocation(new Point(20, 46));
+        ((ViewableComponent)withName("DWL_1_1")).setPreferredLocation(new Point(419, 44));
+        ((ViewableComponent)withName("DW_1_1")).setPreferredLocation(new Point(1139, 40));
     }
     }
