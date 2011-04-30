@@ -20,6 +20,7 @@ public class ExtCatFile extends entity {
 	private int numberOfRecords;
 	private String summaryLevel;
 	private int year;
+	private double processingTime;
 	
 	
 	public ExtCatFile() {
@@ -32,14 +33,15 @@ public class ExtCatFile extends entity {
 	 * @param numberOfRecords
 	 * @param summaryLevel
 	 * @param year
+	 * @param processingTime
 	 */
-	public ExtCatFile(String name, int numberOfRecords, String summaryLevel, int year) {
+	public ExtCatFile(String name, int numberOfRecords, String summaryLevel, int year, double processingTime) {
 		super(name);
 		this.numberOfRecords = numberOfRecords;
 		this.summaryLevel = summaryLevel;
 		this.year = year;
+		this.processingTime = processingTime;
 	}
-
 
 	public int getNumberOfRecords() {
 		return numberOfRecords;
@@ -69,7 +71,8 @@ public class ExtCatFile extends entity {
 	public void setYear(int year) {
 		this.year = year;
 	}
-	
-	
-	
+
+	public double getProcessingTime() {
+		return processingTime;
+	}
 }
