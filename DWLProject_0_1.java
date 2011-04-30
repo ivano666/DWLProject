@@ -26,6 +26,7 @@ public class DWLProject_0_1 extends ViewableDigraph{
     public DWLProject_0_1(String name){
         super(name);
 
+
 // Structure information start
         // Add input port names
 
@@ -45,7 +46,8 @@ public class DWLProject_0_1 extends ViewableDigraph{
 
         // Add Couplings
         addCoupling(DWL_1_1, "insert", DW_1_1, "insert");
-        addCoupling(DWL_1_1, "update", DW_1_1, "update");
+        addCoupling(DWL_1_1, "errorFile", DW_1_1, "errorFile");
+        addCoupling(DWL_1_1, "errorFile", EF_1_1, "errorFile");
         addCoupling(EF_1_1, "FFout", DWL_1_1, "FFin");
         addCoupling(EF_1_1, "start", DWL_1_1, "start");
 
@@ -59,9 +61,9 @@ public class DWLProject_0_1 extends ViewableDigraph{
      */
     public void layoutForSimView()
     {
-        preferredSize = new Dimension(1618, 543);
-        ((ViewableComponent)withName("DW_1_1")).setPreferredLocation(new Point(1139, 40));
-        ((ViewableComponent)withName("DWL_1_1")).setPreferredLocation(new Point(400, 42));
+        preferredSize = new Dimension(1855, 782);
+        ((ViewableComponent)withName("DW_1_1")).setPreferredLocation(new Point(1334, 159));
         ((ViewableComponent)withName("EF_1_1")).setPreferredLocation(new Point(20, 46));
+        ((ViewableComponent)withName("DWL_1_1")).setPreferredLocation(new Point(716, 159));
     }
     }

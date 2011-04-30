@@ -26,7 +26,7 @@ public class Transducer_0_0 extends ViewableAtomic{
 // Structure information start
         // Add input port names
         addInport("stats");
-        addInport("ErrorFile");
+        addInport("errorFile");
 
         // Add output port names
         addOutport("measures");
