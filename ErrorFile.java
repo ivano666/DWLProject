@@ -15,13 +15,13 @@ import GenCol.entity;
 public class ErrorFile extends entity {
 	private static final String ERROR_FILE_TXT = "ErrorFile";
 	private int numberOfRecords;
-	private int numberOfCategories;
+	//private int numberOfCategories;
 	private double registrationTime;
 	
 	public ErrorFile() {
 		super(ERROR_FILE_TXT);
 		this.numberOfRecords = 100;
-		this.numberOfCategories = 2;
+		//this.numberOfCategories = 2;
 		this.registrationTime = 10D;
 	}
 	
@@ -32,11 +32,10 @@ public class ErrorFile extends entity {
 	 * @param numberOfCategories
 	 * @param registrationTime
 	 */
-	public ErrorFile(int numberOfRecords, int numberOfErrors,
-			int numberOfCategories, double registrationTime) {
+	public ErrorFile(int numberOfRecords, double registrationTime) {
 		super(ERROR_FILE_TXT);
 		this.numberOfRecords = numberOfRecords;
-		this.numberOfCategories = numberOfCategories;
+		//this.numberOfCategories = numberOfCategories;
 		this.registrationTime = registrationTime;
 	}
 	public int getNumberOfRecords() {
@@ -45,13 +44,13 @@ public class ErrorFile extends entity {
 	public void setNumberOfRecords(int numberOfRecords) {
 		this.numberOfRecords = numberOfRecords;
 	}
-
+/*
 	public int getNumberOfCategories() {
 		return numberOfCategories;
 	}
 	public void setNumberOfCategories(int numberOfCategories) {
 		this.numberOfCategories = numberOfCategories;
-	}
+	} */
 	public double getRegistrationTime() {
 		return this.registrationTime;
 	}
