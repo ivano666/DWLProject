@@ -37,7 +37,7 @@ public class DWLProject_0_1 extends ViewableDigraph{
         // Initialize sub-components
         ViewableDigraph EF_1_1 =  new EF_1_1("EF_1_1");
         ViewableDigraph DWL_1_1 =  new DWL_1_1("DWL_1_1");
-        ViewableAtomic DW_1_1 =  new DW_1_1("DW_1_1");
+        ViewableAtomic DW_1_1 =  new DW_1_1("DW_1_1", 2);
 
         // Add sub-components
         add(EF_1_1);
