@@ -20,6 +20,8 @@ import GenCol.Pair;
 import GenCol.entity;
 
 public class Loader_0_0 extends ViewableAtomic {
+	private static final String EMPTY_STRING = " ";
+
 	private static final message NULL_MESSAGE = new message();
 
 	private static final String SUMMARY_LEVEL_PREFIX = "L";
@@ -138,7 +140,7 @@ public class Loader_0_0 extends ViewableAtomic {
 		for (ExtCatFile aFile : theFiles) {
 			outputMessage.add(makeContent(EXT_CAT_OUT, aFile));
 		}
-		Pair thePair = new Pair(DONE, currentCatFile);
+		Pair thePair = new Pair(this, currentCatFile);
 		content theContent = makeContent(DONE, thePair);
 		outputMessage.add(theContent);
 	}
@@ -220,5 +222,18 @@ public class Loader_0_0 extends ViewableAtomic {
 		return EXT_CAT_OUT;
 	}
 
-	// Add Show State function
+	@Override
+	public void showState() {
+		super.showState();
+		System.out.println("The CatFile is: " + currentCatFile != null ? currentCatFile : EMPTY_STRING);
+	}
+	
+	@Override
+	public String getTooltipText() {
+		StringBuilder myBuilder = new StringBuilder();
+		myBuilder.append("\n");
+		myBuilder.append("Ext Cat File: ");
+		myBuilder.append(currentCatFile != null ? currentCatFile : EMPTY_STRING);
+		return super.getTooltipText() + myBuilder.toString();
+	}
 }

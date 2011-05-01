@@ -9,9 +9,9 @@
 // Default Package
 package DWLProject;
 
-import GenCol.entity;
 import model.modeling.message;
 import view.modeling.ViewableAtomic;
+import GenCol.entity;
 
 public class CommAgent_0_0 extends ViewableAtomic{
 
@@ -48,6 +48,7 @@ public class CommAgent_0_0 extends ViewableAtomic{
         addOutport("FFout");
 
 //add test input ports:
+        addTestInput(FF_IN, new FlatFile());
 
 // Structure information end
         initialize();
@@ -106,13 +107,8 @@ public class CommAgent_0_0 extends ViewableAtomic{
 			if (value instanceof FlatFile) {
 				FlatFile theFlatFile = (FlatFile) value;
 				loadFileMessage.add(makeContent(FF_OUT, theFlatFile));
-				//holdIn(RECEIVE_FF, theFlatFile.getRegistrationTime());
 				holdIn(SEND_FF, 1);
 			}
-		//	else {
-		//		System.out.println("Not a Flat File: " + value.getName());
-		//		holdIn(PASSIVE, INFINITY);
-		//	}
 		}
 	}
     
@@ -132,7 +128,7 @@ public class CommAgent_0_0 extends ViewableAtomic{
     	if(phaseIs(SEND_FF)){
     		return loadFileMessage;
     	}else
-    	return null;
+    	return new message();
     }
 
     // Add Show State function

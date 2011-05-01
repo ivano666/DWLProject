@@ -215,5 +215,21 @@ public class DW_1_1 extends ViewableAtomic{
     	return NULL_MESSAGE;
     }
 
-    // Add Show State function
+	@Override
+	public void showState() {
+		super.showState();
+		System.out.println("The ExtCatFile Queue has " + extCatFileQueue.size() + " elements");
+		System.out.println("The Queue contains: " + extCatFileQueue);
+		System.out.println("The ProcessedExtCatFile Queue has " + processedExtCatFileQueue.size() + " elements");
+		System.out.println("The Queue contains: " + processedExtCatFileQueue);
+	}
+	
+	@Override
+	public String getTooltipText() {
+		StringBuilder myBuilder = new StringBuilder();
+		myBuilder.append("\n");
+		myBuilder.append("Ext Cat File Queue: ");
+		myBuilder.append(extCatFileQueue);
+		return super.getTooltipText() + myBuilder.toString();
+	}
 }

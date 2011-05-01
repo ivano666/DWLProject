@@ -46,7 +46,7 @@ public class LoaderManager {
 	 * @param numberOfLoaders
 	 * @return list of loaders
 	 */
-	private static List<Loader_0_0> createLoaders(int numberOfLoaders) {
+	public static List<Loader_0_0> createLoaders(int numberOfLoaders) {
 		List<Loader_0_0> theList = new ArrayList<Loader_0_0>(numberOfLoaders);
 		for (int i=0 ; i < numberOfLoaders; i++) {
 			Loader_0_0 aLoader = new Loader_0_0(LOADER + (i+1));

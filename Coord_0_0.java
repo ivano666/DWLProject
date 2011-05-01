@@ -9,6 +9,8 @@
 // Default Package
 package DWLProject;
 
+import java.util.List;
+
 import model.modeling.message;
 import view.modeling.ViewableAtomic;
 import GenCol.Pair;
@@ -56,6 +58,7 @@ public class Coord_0_0 extends ViewableAtomic{
 	
 	private CatFile currentCatFile;
 	private Queue catFileQueue;
+	private Queue workingCatFileQueue;
 	private Queue pendingCatFileQueue;
 	private Queue completedCatQueue;
 	private Queue loadersQueue;
@@ -99,6 +102,7 @@ public class Coord_0_0 extends ViewableAtomic{
         addTestInput(DP_DONE, new entity(DONE));
 
 // Structure information end
+        loadersQueue = new Queue();
         initialize();
     }
 
@@ -108,9 +112,9 @@ public class Coord_0_0 extends ViewableAtomic{
         phase = PASSIVE;
         sigma = INFINITY;
         catFileQueue = new Queue();
+        workingCatFileQueue = new Queue();
         completedCatQueue = new Queue();
         pendingCatFileQueue = new Queue();
-        loadersQueue = new Queue();
         currentCatFile = null;
         loadFileMessage = null;
         partitionFileMessage = null;
@@ -125,12 +129,10 @@ public class Coord_0_0 extends ViewableAtomic{
 				queueCatFile(x, i, e);
 			}
 		}
-		for (int i = 0; i < x.size(); i++) {
-			checkForStartInput(x, i);
-			checkForFlatFile(x, i);
-			checkForCatFile(x, i);
-			checkForDPDone(x, i);
-		}
+		checkForStartInput(x);
+		checkForFlatFile(x);
+		checkForCatFile(x);
+		checkForDPDone(x);
 		for (int i = 0; i < x.size(); i++) {
 			if (messageOnPort(x, LDR_DONE, i)) {
 				entity value = x.getValOnPort(LDR_DONE, i);
@@ -150,13 +152,14 @@ public class Coord_0_0 extends ViewableAtomic{
      * Checks if the <code>DataPartitioner</code> has notified is done
      * sending files and thus 
      * @param x
-     * @param i
      */
-    private void checkForDPDone(message x, int i) {
-		if (messageOnPort(x, DP_DONE, i)) {
-			entity value = x.getValOnPort(DP_DONE, i);
-			if (value.getName().equals(DONE)) {
-				doneDPReceived = true;
+    private void checkForDPDone(message x) {
+		for (int i = 0; i < x.size(); i++) {
+			if (messageOnPort(x, DP_DONE, i)) {
+				entity value = x.getValOnPort(DP_DONE, i);
+				if (value.getName().equals(DONE)) {
+					doneDPReceived = true;
+				}
 			}
 		}
 	}
@@ -166,9 +169,9 @@ public class Coord_0_0 extends ViewableAtomic{
      */
 	private void sendCatFilesToLoaders() {
 		catFilesOutMessage = new message();
-		while (!loadersQueue.isEmpty() && !catFileQueue.isEmpty()) {
+		while (!loadersQueue.isEmpty() && !workingCatFileQueue.isEmpty()) {
 			Loader_0_0 aLoader = (Loader_0_0)loadersQueue.remove();
-			CatFile aCatFile = (CatFile) catFileQueue.remove();
+			CatFile aCatFile = (CatFile) workingCatFileQueue.remove();
 			Pair aPair = new Pair(aLoader.getName(), aCatFile);
 			catFilesOutMessage.add(makeContent(CAT_OUT, aPair));
 		}
@@ -205,24 +208,26 @@ public class Coord_0_0 extends ViewableAtomic{
      * the different <tt>loaders</tt>
      * 
      * @param x
-     * @param i
      */
     @SuppressWarnings("unchecked")
-	private void checkForCatFile(message x, int i) {
+	private void checkForCatFile(message x) {
     	if (phaseIs(PASSIVE)) {
-    		if (messageOnPort(x, CAT_FILE_IN, i)) {
-    			entity value = x.getValOnPort(CAT_FILE_IN, i);
-    			if (value instanceof CatFile) {
-    				CatFile aCatFile = (CatFile) value;
-    				holdIn(RECEIVE_CAT, aCatFile.getRegistrationTime());
-    				currentCatFile = aCatFile;
-    				catFileQueue.add(currentCatFile);
-    			}
-    			else {
-    				System.out.println("Not a Cat File: " + value.getName());
-    				holdIn(PASSIVE, INFINITY);
-    			}
-    		}
+			for (int i = 0; i < x.size(); i++) {
+	    		if (messageOnPort(x, CAT_FILE_IN, i)) {
+	    			entity value = x.getValOnPort(CAT_FILE_IN, i);
+	    			if (value instanceof CatFile) {
+	    				CatFile aCatFile = (CatFile) value;
+	    				holdIn(RECEIVE_CAT, aCatFile.getRegistrationTime());
+	    				currentCatFile = aCatFile;
+	    				workingCatFileQueue.add(currentCatFile);
+	    				catFileQueue.add(currentCatFile);
+	    			}
+	    			else {
+	    				System.out.println("Not a Cat File: " + value.getName());
+	    				holdIn(PASSIVE, INFINITY);
+	    			}
+	    		}
+			}
     	}
 	}
 
@@ -230,22 +235,24 @@ public class Coord_0_0 extends ViewableAtomic{
      * Checks if the <code>FlatFile</code> is in the input port
      * <code>FF_IN</code> and prepares to send it to the
      * <code>FF_OUT</code> port
+     * 
      * @param x
-     * @param i
      */
-    private void checkForFlatFile(message x, int i) {
+    private void checkForFlatFile(message x) {
 		if (phaseIs(PASSIVE)) {
-			if (messageOnPort(x, FF_IN, i)) {
-				entity value = x.getValOnPort(FF_IN, i);
-				if (value instanceof FlatFile) {
-					FlatFile theFlatFile = (FlatFile) value;
-					partitionFileMessage = new message();
-					partitionFileMessage.add(makeContent(FF_OUT, theFlatFile));
-					holdIn(RECEIVE_FF, theFlatFile.getRegistrationTime());
-				}
-				else {
-					System.out.println("Not a Flat File: " + value.getName());
-					holdIn(PASSIVE, INFINITY);
+			for (int i = 0; i < x.size(); i++) {
+				if (messageOnPort(x, FF_IN, i)) {
+					entity value = x.getValOnPort(FF_IN, i);
+					if (value instanceof FlatFile) {
+						FlatFile theFlatFile = (FlatFile) value;
+						partitionFileMessage = new message();
+						partitionFileMessage.add(makeContent(FF_OUT, theFlatFile));
+						holdIn(RECEIVE_FF, theFlatFile.getRegistrationTime());
+					}
+					else {
+						System.out.println("Not a Flat File: " + value.getName());
+						holdIn(PASSIVE, INFINITY);
+					}
 				}
 			}
 		}
@@ -255,17 +262,19 @@ public class Coord_0_0 extends ViewableAtomic{
      * Checks for <code>START</code> on the input port <tt>start</tt>
      * and prepares to send a message to the <code>CommAgent</code>
      * thru the <code>GET_FF</code> port
+     * 
      * @param x
-     * @param i
      */
-	private void checkForStartInput(message x, int i) {
+	private void checkForStartInput(message x) {
 		if (phaseIs(PASSIVE)) {
-			if (messageOnPort(x, START, i)) {
-				entity value = x.getValOnPort(START, i);
-				if (value.getName().equals(START)) {
-					holdIn(NOTIFY_CA, 0);
-					loadFileMessage = new message();
-					loadFileMessage.add(makeContent(GET_FF, new entity(START)));
+			for (int i = 0; i < x.size(); i++) {
+				if (messageOnPort(x, START, i)) {
+					entity value = x.getValOnPort(START, i);
+					if (value.getName().equals(START)) {
+						holdIn(NOTIFY_CA, 0);
+						loadFileMessage = new message();
+						loadFileMessage.add(makeContent(GET_FF, new entity(START)));
+					}
 				}
 			}
 		}
@@ -295,6 +304,7 @@ public class Coord_0_0 extends ViewableAtomic{
     	if (phaseIs(RECEIVE_CAT)) {
 			if (pendingCatFileQueue.size() > 0) {
 				currentCatFile = (CatFile) pendingCatFileQueue.remove();
+				workingCatFileQueue.add(currentCatFile);
 				catFileQueue.add(currentCatFile);
 				holdIn(RECEIVE_CAT, currentCatFile.getRegistrationTime());
 			} else {
@@ -317,11 +327,12 @@ public class Coord_0_0 extends ViewableAtomic{
     	deltext(0D, x);
     }
 
-    @SuppressWarnings("unchecked")
+//    @SuppressWarnings("unchecked")
 	@Override
     public message out(){
     	if (phaseIs(NOTIFY_CA)) {
-			loadersQueue.addAll(LoaderManager.addLoadersToSystem(2, this));
+// TODO: Coupled model inside a coupled model does not refresh appropriately
+//			loadersQueue.addAll(LoaderManager.addLoadersToSystem(2, this));
     		return loadFileMessage;
     	}
     	if (phaseIs(SEND_FF)) {
@@ -347,8 +358,10 @@ public class Coord_0_0 extends ViewableAtomic{
 	@Override
 	public void showState() {
 		super.showState();
-		System.out.println("The CatFile Queue has " + catFileQueue.size() + " elements");
-		System.out.println("The Queue contains: " + catFileQueue);
+		System.out.println("The CatFile Queue has " + workingCatFileQueue.size() + " elements");
+		System.out.println("The Queue contains: " + workingCatFileQueue);
+		System.out.println("The Completed Loading Cat File Queue has " + completedCatQueue.size() + " elements");
+		System.out.println("The Queue contains: " + completedCatQueue);
 		System.out.println("The Loaders Queue has " + loadersQueue.size() + " elements");
 		System.out.println("The Queue contains: " + loadersQueue);
 	}
@@ -361,8 +374,17 @@ public class Coord_0_0 extends ViewableAtomic{
 		myBuilder.append(loadersQueue);
 		myBuilder.append("\n");
 		myBuilder.append("Cat File Queue: ");
-		myBuilder.append(catFileQueue);
+		myBuilder.append(workingCatFileQueue);
 		return super.getTooltipText() + myBuilder.toString();
+	}
+	
+	/**
+	 * Set the loaders into the queue
+	 * @param loaders
+	 */
+	@SuppressWarnings("unchecked")
+	public void setLoaders(List<Loader_0_0> loaders) {
+		loadersQueue.addAll(loaders);
 	}
 }
 

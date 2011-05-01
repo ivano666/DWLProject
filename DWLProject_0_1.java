@@ -18,7 +18,15 @@ import view.modeling.ViewableDigraph;
 
 public class DWLProject_0_1 extends ViewableDigraph{
 
-    // Add Default Constructor
+    private static final String FF_OUT = "FFout";
+	private static final String LOAD = "load";
+	private static final String START = "start";
+	private static final String FF_IN = "FFin";
+	private static final String STATS = "stats";
+	private static final String ERROR_FILE = "errorFile";
+	private static final String HALT = "halt";
+
+	// Add Default Constructor
     public DWLProject_0_1(){
         this("DWLProject_0_1");
     }
@@ -34,10 +42,12 @@ public class DWLProject_0_1 extends ViewableDigraph{
 
 //add test input ports:
 
+        //TODO: read config file to obtain number of processors
+        int numberOfProcessors = 2;
         // Initialize sub-components
         ViewableDigraph EF_1_1 =  new EF_1_1("EF_1_1");
-        ViewableDigraph DWL_1_1 =  new DWL_1_1("DWL_1_1");
-        ViewableAtomic DW_1_1 =  new DW_1_1("DW_1_1", 2);
+        ViewableDigraph DWL_1_1 =  new DWL_1_1("DWL_1_1", numberOfProcessors);
+        ViewableAtomic DW_1_1 =  new DW_1_1("DW_1_1", numberOfProcessors);
 
         // Add sub-components
         add(EF_1_1);
@@ -45,11 +55,13 @@ public class DWLProject_0_1 extends ViewableDigraph{
         add(DW_1_1);
 
         // Add Couplings
-        addCoupling(DWL_1_1, "load", DW_1_1, "load");
-        addCoupling(EF_1_1, "FFout", DWL_1_1, "FFin");
-        addCoupling(EF_1_1, "start", DWL_1_1, "start");
-        addCoupling(DW_1_1, "stats", EF_1_1, "stats");
-        addCoupling(DWL_1_1, "ErrorFile", EF_1_1, "ErrorFile");
+        addCoupling(DWL_1_1, LOAD, DW_1_1, LOAD);
+        addCoupling(EF_1_1, FF_OUT, DWL_1_1, FF_IN);
+        addCoupling(EF_1_1, START, DWL_1_1, START);
+        addCoupling(DW_1_1, STATS, EF_1_1, STATS);
+        addCoupling(DWL_1_1, ERROR_FILE, EF_1_1, ERROR_FILE);
+        addCoupling(DW_1_1, HALT, DWL_1_1, HALT);
+        addCoupling(DWL_1_1, STATS, EF_1_1, STATS);
 
 // Structure information end
         initialize();
@@ -61,9 +73,9 @@ public class DWLProject_0_1 extends ViewableDigraph{
      */
     public void layoutForSimView()
     {
-        preferredSize = new Dimension(1618, 560);
+        preferredSize = new Dimension(1618, 538);
+        ((ViewableComponent)withName("EF_1_1")).setPreferredLocation(new Point(20, 46));
         ((ViewableComponent)withName("DWL_1_1")).setPreferredLocation(new Point(419, 44));
         ((ViewableComponent)withName("DW_1_1")).setPreferredLocation(new Point(1180, 244));
-        ((ViewableComponent)withName("EF_1_1")).setPreferredLocation(new Point(20, 46));
     }
     }
