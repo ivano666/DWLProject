@@ -16,6 +16,12 @@ import view.modeling.ViewableAtomic;
 import view.modeling.ViewableComponent;
 import view.modeling.ViewableDigraph;
 
+/**
+ * DWL_1_1.java
+ * 
+ * @author CosMos, Ivan C, Enrique V
+ *
+ */
 public class DWL_1_1 extends ViewableDigraph{
 
 	private static final String CAT_FILE_IN = "CatFileIn";
@@ -32,6 +38,7 @@ public class DWL_1_1 extends ViewableDigraph{
 	private static final String STATS = "stats";
 	private static final String HALT = "halt";
 	private static final String DP_DONE = "DPDone";
+	private static final String CAT_OUT = "CatOut";
 	
 	private int numberOfProcessors;
 	// Add Default Constructor
@@ -77,6 +84,10 @@ public class DWL_1_1 extends ViewableDigraph{
         addCoupling(this, START, Coord_1_0, START);
         addCoupling(DataPartitioner_1_0, ERROR_FILE, this, ERROR_FILE);
         addCoupling(DataPartitioner_1_0, DP_DONE, Coord_1_0, DP_DONE);
+        addCoupling(Coord_1_0, FF_OUT, this, STATS);
+        addCoupling(Coord_1_0, CAT_OUT, this, STATS);
+        addCoupling(DataPartitioner_1_0, DP_DONE, this, STATS);
+        
         
 // Structure information end
         initialize();
@@ -88,7 +99,9 @@ public class DWL_1_1 extends ViewableDigraph{
     		add(loader);
     		addCoupling(coordinator, Coord_0_0.getCatOut(), loader, Loader_0_0.getCatIn());
     		addCoupling(loader, Loader_0_0.getDone(), coordinator, Coord_0_0.getLdrDone());
+    		addCoupling(loader, Loader_0_0.getDone(), this, STATS);
     		addCoupling(loader, Loader_0_0.getExtCatOut(), this, LOAD);
+    		addCoupling(loader, Loader_0_0.getExtCatOut(), this, STATS);
     	}
     	coordinator.setLoaders(loaderList);
 	}

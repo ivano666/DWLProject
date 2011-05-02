@@ -107,7 +107,7 @@ public class Loader_0_0 extends ViewableAtomic {
 				if (aPair.getKey().equals(this.getName())) {
 					if (aPair.getValue() instanceof CatFile) {
 						currentCatFile = (CatFile) aPair.getValue();
-						holdIn(BUSY, currentCatFile.getRegistrationTime());
+						holdIn(BUSY, currentCatFile.getTimeToRegister());
 					}
 					else {
 						System.out.println("Not a Cat File: " + value.getName());
@@ -158,7 +158,7 @@ public class Loader_0_0 extends ViewableAtomic {
 			for (int j = 0; j < years.length; j++) {
 				String name = currentCatFile.getName()+summaryLevel+years[j];
 				ExtCatFile aFile = new ExtCatFile(name, 
-						currentCatFile.getNumberOfRecords(), summaryLevel, years[j], 1D);
+						currentCatFile.getNumberOfRecords()/i, summaryLevel, years[j], 1D);
 				theFiles.add(aFile);
 			}
 		}

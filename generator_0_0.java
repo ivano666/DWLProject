@@ -28,7 +28,6 @@ public class generator_0_0 extends ViewableAtomic {
 	protected int numberOfYears = 1;
 
 	// Phases
-	private static final String PASSIVE = "passive";
 	private static final String READY = "ready";
 	private static final String START_DW = "startingDW";
 	private static final String SEND_FF = "sendingFF";

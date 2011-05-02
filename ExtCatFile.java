@@ -21,6 +21,8 @@ public class ExtCatFile extends entity {
 	private String summaryLevel;
 	private int year;
 	private double processingTime;
+	private double arrivalTime;
+	private double completionTime;
 	
 	
 	public ExtCatFile() {
@@ -74,5 +76,20 @@ public class ExtCatFile extends entity {
 
 	public double getProcessingTime() {
 		return processingTime;
+	}
+	public double getArrivalTime() {
+		return arrivalTime;
+	}
+
+	public void setArrivalTime(double arrivalTime) {
+		this.arrivalTime = arrivalTime;
+	}
+
+	public double getCompletionTime() {
+		return completionTime;
+	}
+
+	public void setCompletionTime(double completionTime) {
+		this.completionTime = completionTime;
 	}
 }

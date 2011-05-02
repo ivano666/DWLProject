@@ -44,7 +44,6 @@ public class Coord_0_0 extends ViewableAtomic{
 	
 	//Phases
 	private static final String PASSIVE = "passive";
-	private static final String DONE = "Done";
 	private static final String NOTIFY_CA = "NotifyCA";
 	private static final String RECEIVE_FF = "ReceivingFF";
 	private static final String SEND_FF = "SendingFF";
@@ -99,7 +98,7 @@ public class Coord_0_0 extends ViewableAtomic{
         addTestInput(CAT_FILE_IN, new CatFile("Cat1", 10, 10, 3, 1, 2011));
         addTestInput(CAT_FILE_IN, new CatFile("Cat2", 10, 20, 2, 1, 2011), 5);
         addTestInput(CAT_FILE_IN, new CatFile("Cat3", 10, 10, 5, 1, 2011), 15);
-        addTestInput(DP_DONE, new entity(DONE));
+        addTestInput(DP_DONE, new entity(DP_DONE));
 
 // Structure information end
         loadersQueue = new Queue();
@@ -157,7 +156,7 @@ public class Coord_0_0 extends ViewableAtomic{
 		for (int i = 0; i < x.size(); i++) {
 			if (messageOnPort(x, DP_DONE, i)) {
 				entity value = x.getValOnPort(DP_DONE, i);
-				if (value.getName().equals(DONE)) {
+				if (value.getName().equals(DP_DONE)) {
 					doneDPReceived = true;
 				}
 			}
@@ -217,7 +216,7 @@ public class Coord_0_0 extends ViewableAtomic{
 	    			entity value = x.getValOnPort(CAT_FILE_IN, i);
 	    			if (value instanceof CatFile) {
 	    				CatFile aCatFile = (CatFile) value;
-	    				holdIn(RECEIVE_CAT, aCatFile.getRegistrationTime());
+	    				holdIn(RECEIVE_CAT, aCatFile.getTimeToRegister());
 	    				currentCatFile = aCatFile;
 	    				workingCatFileQueue.add(currentCatFile);
 	    				catFileQueue.add(currentCatFile);
@@ -247,7 +246,7 @@ public class Coord_0_0 extends ViewableAtomic{
 						FlatFile theFlatFile = (FlatFile) value;
 						partitionFileMessage = new message();
 						partitionFileMessage.add(makeContent(FF_OUT, theFlatFile));
-						holdIn(RECEIVE_FF, theFlatFile.getRegistrationTime());
+						holdIn(RECEIVE_FF, theFlatFile.getTimeToRegister());
 					}
 					else {
 						System.out.println("Not a Flat File: " + value.getName());
@@ -293,7 +292,7 @@ public class Coord_0_0 extends ViewableAtomic{
     		holdIn(SEND_FF, 0);
     	}
     	if (phaseIs(QUEUEING)) {
-    		double timeLeftForRegistration = currentCatFile.getRegistrationTime();
+    		double timeLeftForRegistration = currentCatFile.getTimeToRegister();
     		if (timeLeftForRegistration >= 0D) {
     			holdIn(RECEIVE_CAT, timeLeftForRegistration);
     		} else {
@@ -306,7 +305,7 @@ public class Coord_0_0 extends ViewableAtomic{
 				currentCatFile = (CatFile) pendingCatFileQueue.remove();
 				workingCatFileQueue.add(currentCatFile);
 				catFileQueue.add(currentCatFile);
-				holdIn(RECEIVE_CAT, currentCatFile.getRegistrationTime());
+				holdIn(RECEIVE_CAT, currentCatFile.getTimeToRegister());
 			} else {
 				passivateIn(PASSIVE);
 				currentCatFile = null;

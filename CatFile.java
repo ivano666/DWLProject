@@ -20,11 +20,13 @@ public class CatFile extends entity {
 	private static final int DEFAULT_NUMBER_OF_RECORDS = 100;
 	private static final String CAT1 = "Cat1";
 	private int numberOfRecords;
-	private double completeRegistrationTime;
-	private double registrationTime;
+	private double originalTimeToRegister;
+	private double timeToRegister;
 	private int numberOfDimensions;
 	private int numberOfSummaryLevels;
 	private int years;
+	private double arrivalTime;
+	private double completionTime;
 	
 	/**
 	 * Default Constructor
@@ -38,16 +40,16 @@ public class CatFile extends entity {
 	 * 
 	 * @param name
 	 * @param numberOfRecords
-	 * @param registrationTime
+	 * @param timeToRegister
 	 * @param dimensions
 	 * @param summaryLevel
 	 * @param years
 	 */
-	public CatFile(String name, int numberOfRecords, double registrationTime, int dimensions, int summaryLevels, int years) {
+	public CatFile(String name, int numberOfRecords, double timeToRegister, int dimensions, int summaryLevels, int years) {
 		super(name);
 		this.numberOfRecords = numberOfRecords;
-		this.registrationTime = registrationTime;
-		this.completeRegistrationTime = registrationTime;
+		this.timeToRegister = timeToRegister;
+		this.originalTimeToRegister = timeToRegister;
 		this.numberOfDimensions = dimensions;
 		this.numberOfSummaryLevels = summaryLevels;
 		this.years = years;
@@ -60,13 +62,13 @@ public class CatFile extends entity {
 		this.numberOfRecords = numberOfRecords;
 	}
 	public void updateRegistrationTime(double e) {
-		this.registrationTime -= e;
+		this.timeToRegister -= e;
 	}
-	public double getRegistrationTime() {
-		return registrationTime;
+	public double getTimeToRegister() {
+		return timeToRegister;
 	}
-	public double getCompleteRegistrationTime() {
-		return completeRegistrationTime;
+	public double getOriginalTimeToRegister() {
+		return originalTimeToRegister;
 	}
 	public int getNumberOfDimensions() {
 		return numberOfDimensions;
@@ -76,5 +78,20 @@ public class CatFile extends entity {
 	}
 	public int getYears() {
 		return years;
+	}
+	public double getArrivalTime() {
+		return arrivalTime;
+	}
+
+	public void setArrivalTime(double arrivalTime) {
+		this.arrivalTime = arrivalTime;
+	}
+
+	public double getCompletionTime() {
+		return completionTime;
+	}
+
+	public void setCompletionTime(double completionTime) {
+		this.completionTime = completionTime;
 	}
 }

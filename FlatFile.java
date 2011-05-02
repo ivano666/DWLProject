@@ -18,15 +18,17 @@ public class FlatFile extends entity {
 	private int numberOfRecords;
 	private int numberOfErrors;
 	private int numberOfCategories;
-	private double registrationTime;
+	private double timeToRegister;
 	private int numberOfYears;
+	private double arrivalTime;
+	private double completionTime;
 	
 	public FlatFile() {
 		super(FLAT_FILE_TXT);
 		this.numberOfRecords = 100;
 		this.numberOfErrors = 0;
 		this.numberOfCategories = 2;
-		this.registrationTime = 10D;
+		this.timeToRegister = 10D;
 		this.numberOfYears = 1;
 	}
 	
@@ -44,7 +46,7 @@ public class FlatFile extends entity {
 		this.numberOfRecords = numberOfRecords;
 		this.numberOfErrors = numberOfErrors;
 		this.numberOfCategories = numberOfCategories;
-		this.registrationTime = registrationTime;
+		this.timeToRegister = registrationTime;
 		this.numberOfYears = numberOfYears;
 	}
 	public int getNumberOfRecords() {
@@ -65,8 +67,8 @@ public class FlatFile extends entity {
 	public void setNumberOfCategories(int numberOfCategories) {
 		this.numberOfCategories = numberOfCategories;
 	}
-	public double getRegistrationTime() {
-		return this.registrationTime;
+	public double getTimeToRegister() {
+		return this.timeToRegister;
 	}
 	public int getNumberOfYears() {
 		return numberOfYears;
@@ -74,4 +76,26 @@ public class FlatFile extends entity {
 	public void setNumberOfYears(int numberOfYears) {
 		this.numberOfYears = numberOfYears;
 	}
+
+	public double getArrivalTime() {
+		return arrivalTime;
+	}
+
+	public void setArrivalTime(double arrivalTime) {
+		this.arrivalTime = arrivalTime;
+	}
+
+	public double getCompletionTime() {
+		return completionTime;
+	}
+
+	public void setCompletionTime(double completionTime) {
+		this.completionTime = completionTime;
+	}
+	
+	public static FlatFile NULL = new FlatFile() {
+		public int getNumberOfRecords() {
+			return 0;
+		}
+	};
 }

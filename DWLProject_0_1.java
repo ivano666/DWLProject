@@ -73,9 +73,9 @@ public class DWLProject_0_1 extends ViewableDigraph{
      */
     public void layoutForSimView()
     {
-        preferredSize = new Dimension(1618, 538);
-        ((ViewableComponent)withName("EF_1_1")).setPreferredLocation(new Point(20, 46));
-        ((ViewableComponent)withName("DWL_1_1")).setPreferredLocation(new Point(419, 44));
+        preferredSize = new Dimension(1618, 531);
         ((ViewableComponent)withName("DW_1_1")).setPreferredLocation(new Point(1180, 244));
+        ((ViewableComponent)withName("DWL_1_1")).setPreferredLocation(new Point(419, 44));
+        ((ViewableComponent)withName("EF_1_1")).setPreferredLocation(new Point(20, 46));
     }
     }

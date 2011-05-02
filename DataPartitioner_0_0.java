@@ -27,7 +27,6 @@ public class DataPartitioner_0_0 extends ViewableAtomic {
 	private static final String CAT_FILE_OUT = "CatFileOut";
 	private static final String ERROR_FILE = "errorFile";
 	private static final String DP_DONE = "DPDone";
-	private static final String DONE = "Done";
 
 	// Phases
 	private static final String PASSIVE = "passive";
@@ -91,7 +90,7 @@ public class DataPartitioner_0_0 extends ViewableAtomic {
 					System.out.println("Invalid Flat File: # of Categories must be > 1");
 					holdIn(PASSIVE, INFINITY);
 				} else
-					holdIn(RECEIVE_FF, flatFile.getRegistrationTime());
+					holdIn(RECEIVE_FF, flatFile.getTimeToRegister());
 			} else {
 				System.out.println("Not a Flat File: " + value.getName());
 				holdIn(PASSIVE, INFINITY);
@@ -178,12 +177,12 @@ public class DataPartitioner_0_0 extends ViewableAtomic {
 				holdIn(SEND_ERRORS, 10);
 			} else {
 				doneMessage = new message();
-				doneMessage.add(makeContent(DP_DONE, new entity(DONE)));
+				doneMessage.add(makeContent(DP_DONE, new entity(DP_DONE)));
 				holdIn(ENDING, 1);
 			}
 		} else if (phaseIs(SEND_ERRORS)) {
 			doneMessage = new message();
-			doneMessage.add(makeContent(DP_DONE, new entity(DONE)));
+			doneMessage.add(makeContent(DP_DONE, new entity(DP_DONE)));
 			holdIn(ENDING, 1);
 		} else
 			passivate();
