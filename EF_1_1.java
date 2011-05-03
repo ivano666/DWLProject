@@ -9,6 +9,8 @@ package DWLProject;
 import java.awt.Dimension;
 import java.awt.Point;
 
+import DWLProject.utils.DWLProperties;
+
 import view.modeling.ViewableAtomic;
 import view.modeling.ViewableComponent;
 import view.modeling.ViewableDigraph;
@@ -46,8 +48,7 @@ public class EF_1_1 extends ViewableDigraph {
 
 		// Initialize sub-components
 		ViewableAtomic generator_1_0 = new generator_0_0("Generator", 10);
-		//TODO: read observationTime from properties file
-		observationTime = 100D;
+		observationTime = Double.valueOf(DWLProperties.getInstance().getValue("ObservationTime"));
 		ViewableAtomic transducer_1_0 = new Transducer_0_0("Transducer_1_0",
 				observationTime);
 

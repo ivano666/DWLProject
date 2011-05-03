@@ -15,6 +15,7 @@ import java.awt.Point;
 import view.modeling.ViewableAtomic;
 import view.modeling.ViewableComponent;
 import view.modeling.ViewableDigraph;
+import DWLProject.utils.DWLProperties;
 
 public class DWLProject_0_1 extends ViewableDigraph{
 
@@ -25,10 +26,12 @@ public class DWLProject_0_1 extends ViewableDigraph{
 	private static final String STATS = "stats";
 	private static final String ERROR_FILE = "errorFile";
 	private static final String HALT = "halt";
+	private static final String EXT_CAT_IN = "ExtCatIn";
+	private static final String EXT_CAT_OUT = "ExtCatOut";
 
 	// Add Default Constructor
     public DWLProject_0_1(){
-        this("DWLProject_0_1");
+        this("DWLProject");
     }
 
     // Add Parameterized Constructor
@@ -42,12 +45,11 @@ public class DWLProject_0_1 extends ViewableDigraph{
 
 //add test input ports:
 
-        //TODO: read config file to obtain number of processors
-        int numberOfProcessors = 2;
+        int numberOfProcessors = Integer.valueOf(DWLProperties.getInstance().getValue("Processors"));
         // Initialize sub-components
-        ViewableDigraph EF_1_1 =  new EF_1_1("EF_1_1");
-        ViewableDigraph DWL_1_1 =  new DWL_1_1("DWL_1_1", numberOfProcessors);
-        ViewableAtomic DW_1_1 =  new DW_1_1("DW_1_1", numberOfProcessors);
+        ViewableDigraph EF_1_1 =  new EF_1_1("EF");
+        ViewableDigraph DWL_1_1 =  new DWL_1_1("DWL", numberOfProcessors);
+        ViewableAtomic DW_1_1 =  new DW_1_1("DW", numberOfProcessors);
 
         // Add sub-components
         add(EF_1_1);
@@ -62,6 +64,7 @@ public class DWLProject_0_1 extends ViewableDigraph{
         addCoupling(DWL_1_1, ERROR_FILE, EF_1_1, ERROR_FILE);
         addCoupling(DW_1_1, HALT, DWL_1_1, HALT);
         addCoupling(DWL_1_1, STATS, EF_1_1, STATS);
+        addCoupling(DWL_1_1, EXT_CAT_OUT, DW_1_1, EXT_CAT_IN);
 
 // Structure information end
         initialize();
@@ -73,9 +76,9 @@ public class DWLProject_0_1 extends ViewableDigraph{
      */
     public void layoutForSimView()
     {
-        preferredSize = new Dimension(1618, 531);
-        ((ViewableComponent)withName("DW_1_1")).setPreferredLocation(new Point(1180, 244));
-        ((ViewableComponent)withName("DWL_1_1")).setPreferredLocation(new Point(419, 44));
-        ((ViewableComponent)withName("EF_1_1")).setPreferredLocation(new Point(20, 46));
+        preferredSize = new Dimension(1177, 657);
+        ((ViewableComponent)withName("EF")).setPreferredLocation(new Point(40, 56));
+        ((ViewableComponent)withName("DW")).setPreferredLocation(new Point(583, 573));
+        ((ViewableComponent)withName("DWL")).setPreferredLocation(new Point(455, 55));
     }
     }

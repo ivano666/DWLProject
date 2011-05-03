@@ -19,7 +19,7 @@ import view.modeling.ViewableAtomic;
 public class LoaderManager {
 	
 	private static final String LOAD = "load";
-	private static final String LOADER = "Loader_1_";
+	private static final String LOADER = "Loader_";
 
 	private LoaderManager() {
 	}

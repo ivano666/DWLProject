@@ -24,10 +24,12 @@ public class DW_1_1 extends ViewableAtomic{
 	private static final String STATS = "stats";
 	private static final String HALT = "halt";
 	//phases
-    private static final String PASSIVE = "passive";
-	private static final String BUSY = "busy";
-	private static final String HALTING = "halting";
+    private static final String PASSIVE = "Passive";
+	private static final String BUSY = "Busy";
+	private static final String HALTING = "Halting";
 	private static final String QUEUEING = "QueueingCat";
+	private static final String EXT_CAT_IN = "ExtCatIn";
+	private static final String LOADING = "Loading";
 	/**
 	 * Takes 1 unit of time to queue an incoming Cat File 
 	 */
@@ -43,7 +45,7 @@ public class DW_1_1 extends ViewableAtomic{
 
     // Add Default Constructor
     public DW_1_1(){
-        this("DW_1_1", 2);
+        this("DW", 2);
     }
 
     // Add Parameterized Constructors
@@ -52,6 +54,7 @@ public class DW_1_1 extends ViewableAtomic{
         this.numberOfProcessors = numberOfProcessors;
 // Structure information start
         // Add input port names
+        addInport(EXT_CAT_IN);
         addInport(LOAD);
         addInport(STOP);
 
@@ -60,11 +63,11 @@ public class DW_1_1 extends ViewableAtomic{
         addOutport(HALT);
 
 //add test input ports:
-        addTestInput(LOAD, new ExtCatFile("ExtCat1", 100, "1", 2011, 10));
-        addTestInput(LOAD, new ExtCatFile("ExtCat2", 100, "1", 2011, 10));
-        addTestInput(LOAD, new ExtCatFile("ExtCat3", 100, "1", 2011, 10));
-        addTestInput(LOAD, new ExtCatFile("ExtCat4", 80, "2", 2011, 8));
-        addTestInput(LOAD, new ExtCatFile("ExtCat5", 20, "3", 2011, 2));
+        addTestInput(EXT_CAT_IN, new ExtCatFile("ExtCat1", 100, "1", 2011, 10));
+        addTestInput(EXT_CAT_IN, new ExtCatFile("ExtCat2", 100, "1", 2011, 10));
+        addTestInput(EXT_CAT_IN, new ExtCatFile("ExtCat3", 100, "1", 2011, 10));
+        addTestInput(EXT_CAT_IN, new ExtCatFile("ExtCat4", 80, "2", 2011, 8));
+        addTestInput(EXT_CAT_IN, new ExtCatFile("ExtCat5", 20, "3", 2011, 2));
 
 // Structure information end
         initialize();
@@ -84,6 +87,9 @@ public class DW_1_1 extends ViewableAtomic{
     	for (int i = 0 ; i < x.getLength(); i++) {
     		checkForStop(x, i);
     	}
+    	for (int i = 0 ; i < x.getLength(); i++) {
+    		checkForLoad(x, i);
+    	}
     	if (phaseIs(BUSY)) {
     		queueExtCatFiles(x, e);
     	} 
@@ -93,6 +99,22 @@ public class DW_1_1 extends ViewableAtomic{
     }
 
     /**
+     * Checks if the loading of ExtCat should start
+     * 
+     * @param x
+     * @param i
+     */
+    private void checkForLoad(message x, int i) {
+    	if (messageOnPort(x, LOAD, i)) {
+    		entity value = x.getValOnPort(LOAD, i);
+    		if (value.getName().equals(LOAD)) {
+    			processingTime = processFiles();
+    			holdIn(LOADING, processingTime);
+    		}
+    	}
+	}
+
+	/**
      * Queues any <code>ExtCatFile</code> that comes
      * in while the <tt>DW</tt> is <code>BUSY</code>
      * @param x
@@ -130,11 +152,12 @@ public class DW_1_1 extends ViewableAtomic{
     			}
     		}
     	}
-		if (!extCatFileQueue.isEmpty()) {
-			processingTime = processFiles();
-			holdIn(BUSY, processingTime);
-			prepareOutput();
-		}
+    	//TODO: queue these separately
+//		if (!extCatFileQueue.isEmpty()) {
+//			processingTime = processFiles();
+//			holdIn(BUSY, processingTime);
+//			prepareOutput();
+//		}
 	}
 
     /**

@@ -29,7 +29,7 @@ import GenCol.entity;
 public class Coord_0_0 extends ViewableAtomic{
 	
 	private static final message NULL_MESSAGE = new message();
-	private static final String COORD_0_0 = "Coord_0_0";
+	private static final String COORD = "Coord";
 	//Input Ports
 	private static final String START = "start";
 	private static final String FF_IN = "FFin";
@@ -41,6 +41,8 @@ public class Coord_0_0 extends ViewableAtomic{
     private static final String GET_FF = "GetFF";
 	private static final String FF_OUT = "FFout";
 	private static final String CAT_OUT = "CatOut";
+	private static final String LOAD = "load";
+	
 	
 	//Phases
 	private static final String PASSIVE = "passive";
@@ -50,6 +52,7 @@ public class Coord_0_0 extends ViewableAtomic{
 	private static final String SEND_CAT = "SendingCats";
 	private static final String RECEIVE_CAT = "ReceivingCat";
 	private static final String QUEUEING = "QueueingCat";
+	private static final String LDRS_DONE = "LoadersDone";
 	/**
 	 * Takes 1 unit of time to queue an incoming Cat File 
 	 */
@@ -65,12 +68,13 @@ public class Coord_0_0 extends ViewableAtomic{
 	private message partitionFileMessage;
 	private message catFilesOutMessage;
 	private boolean doneDPReceived;
+	private message loadersDoneMessage;
 
 	/**
 	 * Default Constructor
 	 */
     public Coord_0_0(){
-        this(COORD_0_0);    }
+        this(COORD);    }
 
     /**
      * Parameterized Constructor
@@ -91,6 +95,7 @@ public class Coord_0_0 extends ViewableAtomic{
         addOutport(CAT_OUT);
         addOutport(FF_OUT);
         addOutport(GET_FF);
+        addOutport(LOAD);
 
 //add test input ports:
         addTestInput(START, new entity(START));
@@ -311,9 +316,14 @@ public class Coord_0_0 extends ViewableAtomic{
 				currentCatFile = null;
 			}
     	}
+    	if (phaseIs(LDRS_DONE)) {
+    		passivateIn(PASSIVE);
+    	}
     	if (phaseIs(SEND_CAT)) {
     		if (catFileQueue.size() == completedCatQueue.size()) {
-    			passivateIn(PASSIVE);
+    			holdIn(LDRS_DONE, 0);
+        		loadersDoneMessage = new message();
+        		loadersDoneMessage.add(makeContent(LOAD, new entity("start")));
     		} else {
     			sendCatFilesToLoaders();
     		}
@@ -339,6 +349,9 @@ public class Coord_0_0 extends ViewableAtomic{
     	}
     	if (phaseIs(SEND_CAT)) {
     		return catFilesOutMessage;
+    	}
+    	if (phaseIs(LDRS_DONE)) {
+    		return loadersDoneMessage;
     	}
     	return NULL_MESSAGE;
     }
