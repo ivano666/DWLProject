@@ -65,12 +65,12 @@ public class Transducer_0_0 extends ViewableAtomic{
         addTestInput(STATS, new FlatFile(100, 0, 5, 1, 2));
         addTestInput(ERROR_FILE, new ErrorFile(10, 1D));
         addTestInput(STATS, new CatFile("Cat1", 100, 1, 5, 1, 1));
-        ExtCatFile anExtCatFile = new ExtCatFile("ExtCat1", 100, "L1", 2011, 1D);
+        ExtCatFile anExtCatFile = new ExtCatFile("ExtCat1", 100, "L1", 2011, 1D, 1D);
         addTestInput(STATS, anExtCatFile);
         addTestInput(STATS, new CatFile("Cat2", 100, 1, 5, 2, 1));
-        anExtCatFile = new ExtCatFile("ExtCat21", 100, "L1", 2011, 1D);
+        anExtCatFile = new ExtCatFile("ExtCat21", 100, "L1", 2011, 1D, 1D);
         addTestInput(STATS, anExtCatFile);
-        anExtCatFile = new ExtCatFile("ExtCat22", 80, "L2", 2011, 1D);
+        anExtCatFile = new ExtCatFile("ExtCat22", 80, "L2", 2011, 1D, 1D);
         addTestInput(STATS, anExtCatFile);
     }
 
@@ -110,13 +110,25 @@ public class Transducer_0_0 extends ViewableAtomic{
 						if (catFilesArrived.containsKey(catFile.getName())) {
 							catFile.setCompletionTime(clock);
 							catFileCompleted.put(catFile.getName(), catFile);
-							totalCatTurnAround += clock - catFile.getArrivalTime();
+							totalCatTurnAround += clock
+									- catFile.getArrivalTime();
 							totalCatProcessingTime += catFile.getOriginalTimeToRegister();
 							totalRowsCat += catFile.getNumberOfRecords();
 						} else {
 							catFile.setArrivalTime(clock);
 							catFilesArrived.put(catFile.getName(), catFile);
 						}
+					} else if (aPair.getValue() instanceof ExtCatFile) {
+						ExtCatFile extCatFile = (ExtCatFile) aPair.getValue();
+						if (extCatFileArrived.containsKey(extCatFile.getName())) {
+							extCatFileCompleted.put(extCatFile.getName(), extCatFile);
+							totalExtCatTurnAround += clock - extCatFile.getArrivalTime();
+							totalExtCatProcessingTime += extCatFile.getProcessingTime();
+							totalRowsExtCat += extCatFile.getNumberOfRecords();
+						} else {
+							extCatFileArrived.put(extCatFile.getName(), extCatFile);
+						}
+						
 					}
 				} else if (val instanceof ExtCatFile) {
 						ExtCatFile extCatFile = (ExtCatFile) val;

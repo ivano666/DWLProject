@@ -15,6 +15,7 @@ import java.util.List;
 import view.modeling.ViewableAtomic;
 import view.modeling.ViewableComponent;
 import view.modeling.ViewableDigraph;
+import DWLProject.utils.DWLUtils;
 
 /**
  * DWL_1_1.java
@@ -68,7 +69,7 @@ public class DWL_1_1 extends ViewableDigraph{
 
         // Initialize sub-components
         ViewableAtomic CommAgent_1_0 =  new CommAgent_0_0("CommAgent");
-        Coord_0_0 Coord_1_0 =  new Coord_0_0("Coordinator");
+        DWL_Coord_0_0 Coord_1_0 =  new DWL_Coord_0_0("Coordinator");
         ViewableAtomic DataPartitioner_1_0 =  new DataPartitioner_0_0("DataPartitioner");
 
         // Add sub-components
@@ -96,13 +97,12 @@ public class DWL_1_1 extends ViewableDigraph{
         initialize();
         }
 
-    private void addLoaders(Coord_0_0 coordinator) {
-    	List<Loader_0_0> loaderList = LoaderManager.createLoaders(numberOfProcessors);
+    private void addLoaders(DWL_Coord_0_0 coordinator) {
+    	List<Loader_0_0> loaderList = DWLUtils.createLoaders(numberOfProcessors);
     	for (Loader_0_0 loader : loaderList) {
     		add(loader);
-    		addCoupling(coordinator, Coord_0_0.getCatOut(), loader, Loader_0_0.getCatIn());
-    		addCoupling(loader, Loader_0_0.getDone(), coordinator, Coord_0_0.getLdrDone());
-    		addCoupling(loader, Loader_0_0.getDone(), this, STATS);
+    		addCoupling(coordinator, DWL_Coord_0_0.getCatOut(), loader, Loader_0_0.getCatIn());
+    		addCoupling(loader, Loader_0_0.getDone(), coordinator, DWL_Coord_0_0.getLdrDone());
     		addCoupling(loader, Loader_0_0.getExtCatOut(), this, EXT_CAT_OUT);
     	}
     	coordinator.setLoaders(loaderList);
@@ -114,11 +114,11 @@ public class DWL_1_1 extends ViewableDigraph{
      */
     public void layoutForSimView()
     {
-        preferredSize = new Dimension(693, 470);
-        ((ViewableComponent)withName("CommAgent")).setPreferredLocation(new Point(10, 47));
+        preferredSize = new Dimension(610, 471);
         ((ViewableComponent)withName("Loader_2")).setPreferredLocation(new Point(243, 360));
-        ((ViewableComponent)withName("DataPartitioner")).setPreferredLocation(new Point(2, 152));
-        ((ViewableComponent)withName("Coordinator")).setPreferredLocation(new Point(221, 93));
+        ((ViewableComponent)withName("DataPartitioner")).setPreferredLocation(new Point(10, 160));
         ((ViewableComponent)withName("Loader_1")).setPreferredLocation(new Point(246, 285));
+        ((ViewableComponent)withName("CommAgent")).setPreferredLocation(new Point(10, 47));
+        ((ViewableComponent)withName("Coordinator")).setPreferredLocation(new Point(221, 93));
     }
 }

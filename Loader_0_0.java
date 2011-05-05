@@ -12,6 +12,7 @@ package DWLProject;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Random;
 
 import model.modeling.content;
 import model.modeling.message;
@@ -42,7 +43,7 @@ public class Loader_0_0 extends ViewableAtomic {
 	
 	// Add Default Constructor
 	public Loader_0_0() {
-		this("Loader_0_0");
+		this("Loader");
 	}
 
 	/**
@@ -151,15 +152,19 @@ public class Loader_0_0 extends ViewableAtomic {
 	 * @return
 	 */
 	private List<ExtCatFile> createExtCatFiles() {
+		Random rand = new Random();
 		List<ExtCatFile> theFiles = new ArrayList<ExtCatFile>(currentCatFile.getNumberOfSummaryLevels()); 
 		for (int i = 1; i <= currentCatFile.getNumberOfSummaryLevels(); i++) {
 			String summaryLevel = SUMMARY_LEVEL_PREFIX+i;
 			int[] years = getYears(currentCatFile.getYears());
 			for (int j = 0; j < years.length; j++) {
 				String name = currentCatFile.getName()+summaryLevel+years[j];
+				double regTime = rand.nextInt(5);
 				ExtCatFile aFile = new ExtCatFile(name, 
-						currentCatFile.getNumberOfRecords()/i, summaryLevel, years[j], 1D);
+						currentCatFile.getNumberOfRecords()/i, summaryLevel, years[j], 1D, regTime);
+				aFile.setParentCatFile(currentCatFile);
 				theFiles.add(aFile);
+				currentCatFile.addExtCatFile(aFile);
 			}
 		}
 		return theFiles;
@@ -232,7 +237,7 @@ public class Loader_0_0 extends ViewableAtomic {
 	public String getTooltipText() {
 		StringBuilder myBuilder = new StringBuilder();
 		myBuilder.append("\n");
-		myBuilder.append("Ext Cat File: ");
+		myBuilder.append("Cat File: ");
 		myBuilder.append(currentCatFile != null ? currentCatFile : EMPTY_STRING);
 		return super.getTooltipText() + myBuilder.toString();
 	}

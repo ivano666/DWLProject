@@ -12,7 +12,6 @@ package DWLProject;
 import java.awt.Dimension;
 import java.awt.Point;
 
-import view.modeling.ViewableAtomic;
 import view.modeling.ViewableComponent;
 import view.modeling.ViewableDigraph;
 import DWLProject.utils.DWLProperties;
@@ -49,7 +48,7 @@ public class DWLProject_0_1 extends ViewableDigraph{
         // Initialize sub-components
         ViewableDigraph EF_1_1 =  new EF_1_1("EF");
         ViewableDigraph DWL_1_1 =  new DWL_1_1("DWL", numberOfProcessors);
-        ViewableAtomic DW_1_1 =  new DW_1_1("DW", numberOfProcessors);
+        ViewableDigraph DW_1_1 =  new DW_1_1("DW", numberOfProcessors);
 
         // Add sub-components
         add(EF_1_1);
@@ -76,9 +75,9 @@ public class DWLProject_0_1 extends ViewableDigraph{
      */
     public void layoutForSimView()
     {
-        preferredSize = new Dimension(1177, 657);
-        ((ViewableComponent)withName("EF")).setPreferredLocation(new Point(40, 56));
-        ((ViewableComponent)withName("DW")).setPreferredLocation(new Point(583, 573));
-        ((ViewableComponent)withName("DWL")).setPreferredLocation(new Point(455, 55));
+        preferredSize = new Dimension(1609, 549);
+        ((ViewableComponent)withName("DW")).setPreferredLocation(new Point(1103, 52));
+        ((ViewableComponent)withName("DWL")).setPreferredLocation(new Point(435, 51));
+        ((ViewableComponent)withName("EF")).setPreferredLocation(new Point(32, 51));
     }
     }

@@ -3,6 +3,7 @@
  */
 package DWLProject;
 
+import DWLProject.utils.ExtCatFileStatus;
 import GenCol.entity;
 
 
@@ -23,7 +24,9 @@ public class ExtCatFile extends entity {
 	private double processingTime;
 	private double arrivalTime;
 	private double completionTime;
-	
+	private double timeToRegister;
+	private CatFile parentCatFile;
+	private ExtCatFileStatus status = ExtCatFileStatus.NONE;
 	
 	public ExtCatFile() {
 		super(EXT_CAT1);
@@ -36,13 +39,15 @@ public class ExtCatFile extends entity {
 	 * @param summaryLevel
 	 * @param year
 	 * @param processingTime
+	 * @param timeToRegister
 	 */
-	public ExtCatFile(String name, int numberOfRecords, String summaryLevel, int year, double processingTime) {
+	public ExtCatFile(String name, int numberOfRecords, String summaryLevel, int year, double processingTime, double timeToRegister) {
 		super(name);
 		this.numberOfRecords = numberOfRecords;
 		this.summaryLevel = summaryLevel;
 		this.year = year;
 		this.processingTime = processingTime;
+		this.timeToRegister = timeToRegister;
 	}
 
 	public int getNumberOfRecords() {
@@ -92,4 +97,32 @@ public class ExtCatFile extends entity {
 	public void setCompletionTime(double completionTime) {
 		this.completionTime = completionTime;
 	}
+
+	public ExtCatFileStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(ExtCatFileStatus status) {
+		this.status = status;
+	}
+
+	public double getTimeToRegister() {
+		return timeToRegister;
+	}
+	public void updateTimeToRegister(double e) {
+		timeToRegister -=e;
+	}
+
+	public void setTimeToRegister(double regTime) {
+		timeToRegister = regTime;
+	}
+
+	public CatFile getParentCatFile() {
+		return parentCatFile;
+	}
+
+	public void setParentCatFile(CatFile parentCatFile) {
+		this.parentCatFile = parentCatFile;
+	}
+	
 }

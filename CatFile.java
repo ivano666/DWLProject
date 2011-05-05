@@ -3,6 +3,9 @@
  */
 package DWLProject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import GenCol.entity;
 
 /**
@@ -27,6 +30,8 @@ public class CatFile extends entity {
 	private int years;
 	private double arrivalTime;
 	private double completionTime;
+	private List<ExtCatFile> extCatList;
+	private List<ExtCatFile> processedExtCatList;
 	
 	/**
 	 * Default Constructor
@@ -53,6 +58,8 @@ public class CatFile extends entity {
 		this.numberOfDimensions = dimensions;
 		this.numberOfSummaryLevels = summaryLevels;
 		this.years = years;
+		extCatList = new ArrayList<ExtCatFile>();
+		processedExtCatList = new ArrayList<ExtCatFile>();
 	}
 
 	public int getNumberOfRecords() {
@@ -93,5 +100,26 @@ public class CatFile extends entity {
 
 	public void setCompletionTime(double completionTime) {
 		this.completionTime = completionTime;
+	}
+	
+	public boolean addExtCatFile(ExtCatFile aFile) {
+		return extCatList.add(aFile);
+	}
+	
+	public boolean addProcessedExtCatFile(ExtCatFile aFile) {
+		return processedExtCatList.add(aFile);
+	}
+
+	public List<ExtCatFile> getExtCatList() {
+		return extCatList;
+	}
+
+	public List<ExtCatFile> getProcessedExtCatList() {
+		return processedExtCatList;
+	}
+
+	public boolean isCompleted() {
+		return !extCatList.isEmpty() && !processedExtCatList.isEmpty() 
+		&& (extCatList.size() == processedExtCatList.size());
 	}
 }
