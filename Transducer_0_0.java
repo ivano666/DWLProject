@@ -10,6 +10,8 @@
 package DWLProject;
 
 import java.awt.Color;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,7 +29,9 @@ import GenCol.entity;
  */
 public class Transducer_0_0 extends ViewableAtomic{
 
-    private static final String MEASURES = "measures";
+    private static final String COMMA = ", ";
+	private static final String CARRIAGE_RETURN = "\r\n";
+	private static final String MEASURES = "measures";
 	private static final String ERROR_FILE = "errorFile";
 	private static final String STATS = "stats";
 	private static final String ACTIVE = "active";
@@ -160,31 +164,135 @@ public class Transducer_0_0 extends ViewableAtomic{
     // Add output function
     @Override
     public message out(){
+    	StringBuilder myBuilder = new StringBuilder();
+    	
     	message output = new message();
-    	content aContent = makeContent(MEASURES, new entity(" - Cat files arrived: " + catFilesArrived.size()));
+    	String totalLoadString = " - Total Load time: ";
+		content aContent = makeContent(MEASURES, new entity(totalLoadString + clock));
+		myBuilder.append(totalLoadString);
+		myBuilder.append(COMMA);
+		myBuilder.append(clock);
+		myBuilder.append(CARRIAGE_RETURN);
     	output.add(aContent);
-    	aContent = makeContent(MEASURES, new entity(" - Cat files completed: " + catFileCompleted.size()));
+
+    	String catFilesArrivedString = " - Cat files arrived: ";
+		aContent = makeContent(MEASURES, new entity(catFilesArrivedString + catFilesArrived.size()));
+		myBuilder.append(catFilesArrivedString);
+		myBuilder.append(COMMA);
+		myBuilder.append(catFilesArrived.size());
+		myBuilder.append(CARRIAGE_RETURN);
     	output.add(aContent);
-    	aContent = makeContent(MEASURES, new entity(" - ExtCat files arrived: " + extCatFileArrived.size()));
+
+    	String catFilesCompletedString = " - Cat files completed: ";
+		aContent = makeContent(MEASURES, new entity(catFilesCompletedString + catFileCompleted.size()));
+		myBuilder.append(catFilesCompletedString);
+		myBuilder.append(COMMA);
+		myBuilder.append(catFileCompleted.size());
+		myBuilder.append(CARRIAGE_RETURN);
     	output.add(aContent);
-    	aContent = makeContent(MEASURES, new entity(" - ExtCat files completed: " + extCatFileCompleted.size()));
+    	
+    	String extCatFilesArrivedString = " - ExtCat files arrived: ";
+		aContent = makeContent(MEASURES, new entity(extCatFilesArrivedString + extCatFileArrived.size()));
+		myBuilder.append(extCatFilesArrivedString);
+		myBuilder.append(COMMA);
+		myBuilder.append(extCatFileArrived.size());
+		myBuilder.append(CARRIAGE_RETURN);
     	output.add(aContent);
-    	aContent = makeContent(MEASURES, new entity(" - # Rows: " + flatFile.getNumberOfRecords()));
+    	
+    	String extCatFilesCompletedString = " - ExtCat files completed: ";
+		aContent = makeContent(MEASURES, new entity(extCatFilesCompletedString + extCatFileCompleted.size()));
+		myBuilder.append(extCatFilesCompletedString);
+		myBuilder.append(COMMA);
+		myBuilder.append(extCatFileCompleted.size());
+		myBuilder.append(CARRIAGE_RETURN);
     	output.add(aContent);
-    	aContent = makeContent(MEASURES, new entity(" - # Errors: " + errorFile.getNumberOfRecords()));
+    	
+    	String numberOfRowsString = " - # Rows: ";
+		aContent = makeContent(MEASURES, new entity(numberOfRowsString + flatFile.getNumberOfRecords()));
+		myBuilder.append(numberOfRowsString);
+		myBuilder.append(COMMA);
+		myBuilder.append(flatFile.getNumberOfRecords());
+		myBuilder.append(CARRIAGE_RETURN);
     	output.add(aContent);
-    	aContent = makeContent(MEASURES, new entity(" - Avg Cat file turnaround time: " + computeCatAvgTA()));
+    	
+    	String numberOfErrorsString = " - # Errors: ";
+		aContent = makeContent(MEASURES, new entity(numberOfErrorsString + errorFile.getNumberOfRecords()));
+		myBuilder.append(numberOfErrorsString);
+		myBuilder.append(COMMA);
+		myBuilder.append(errorFile.getNumberOfRecords());
+		myBuilder.append(CARRIAGE_RETURN);
     	output.add(aContent);
-    	aContent = makeContent(MEASURES, new entity(" - Avg ExtCat file turnaround time: " + computeExtCatAvgTA()));
+    	
+    	String avgTACatString = " - Avg Cat file turnaround time: ";
+		double computeCatAvgTA = computeCatAvgTA();
+		aContent = makeContent(MEASURES, new entity(avgTACatString + computeCatAvgTA));
+		myBuilder.append(avgTACatString);
+		myBuilder.append(COMMA);
+		myBuilder.append(computeCatAvgTA);
+		myBuilder.append(CARRIAGE_RETURN);
     	output.add(aContent);
-    	aContent = makeContent(MEASURES, new entity(" - Avg Cat file processing time: " + computeCatAvgPT()));
+    	
+    	String avgExtTAString = " - Avg ExtCat file turnaround time: ";
+		double computeExtCatAvgTA = computeExtCatAvgTA();
+		aContent = makeContent(MEASURES, new entity(avgExtTAString + computeExtCatAvgTA));
+		myBuilder.append(avgExtTAString);
+		myBuilder.append(COMMA);
+		myBuilder.append(computeExtCatAvgTA);
+		myBuilder.append(CARRIAGE_RETURN);
     	output.add(aContent);
-    	aContent = makeContent(MEASURES, new entity(" - Avg ExtCat file processing time: " + computeExtCatAvgPT()));
+    	
+    	String avgCatProcessingString = " - Avg Cat file processing time: ";
+		double computeCatAvgPT = computeCatAvgPT();
+		aContent = makeContent(MEASURES, new entity(avgCatProcessingString + computeCatAvgPT));
+		myBuilder.append(avgCatProcessingString);
+		myBuilder.append(COMMA);
+		myBuilder.append(computeCatAvgPT);
+		myBuilder.append(CARRIAGE_RETURN);
     	output.add(aContent);
-    	aContent = makeContent(MEASURES, new entity(" - Avg #Rows Per Cat file: " + computeCatAvgRows()));
+    	
+    	String avgExtCatProcessingString = " - Avg ExtCat file processing time: ";
+		double computeExtCatAvgPT = computeExtCatAvgPT();
+		aContent = makeContent(MEASURES, new entity(avgExtCatProcessingString + computeExtCatAvgPT));
+		myBuilder.append(avgExtCatProcessingString);
+		myBuilder.append(COMMA);
+		myBuilder.append(computeExtCatAvgPT);
+		myBuilder.append(CARRIAGE_RETURN);
     	output.add(aContent);
-    	aContent = makeContent(MEASURES, new entity(" - Avg #Rows Per ExtCat file: " + computeExtCatAvgRows()));
+    	
+    	String avgRowsPerCatString = " - Avg #Rows Per Cat file: ";
+		int computeCatAvgRows = computeCatAvgRows();
+		aContent = makeContent(MEASURES, new entity(avgRowsPerCatString + computeCatAvgRows));
+		myBuilder.append(avgRowsPerCatString);
+		myBuilder.append(COMMA);
+		myBuilder.append(computeCatAvgRows);
+		myBuilder.append(CARRIAGE_RETURN);
     	output.add(aContent);
+    	
+    	String avgRowsPerExtCatString = " - Avg #Rows Per ExtCat file: ";
+		int computeExtCatAvgRows = computeExtCatAvgRows();
+		aContent = makeContent(MEASURES, new entity(avgRowsPerExtCatString + computeExtCatAvgRows));
+		myBuilder.append(avgRowsPerExtCatString);
+		myBuilder.append(COMMA);
+		myBuilder.append(computeExtCatAvgRows);
+		myBuilder.append(CARRIAGE_RETURN);
+    	output.add(aContent);
+    	
+    	FileWriter aWriter = null;
+    	try {
+			aWriter = new FileWriter("DWLStats.cvs");
+			aWriter.write(myBuilder.toString());
+			aWriter.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (aWriter != null) {
+				try {
+					aWriter.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		} 
     	
     	return output;
     }
@@ -200,6 +308,7 @@ public class Transducer_0_0 extends ViewableAtomic{
 	}
     
     private void displayCurrentStats() {
+    	System.out.println(" - Total Load time: " + clock);
 		System.out.println(" - Cat files arrived: " + catFilesArrived.size());
 		System.out.println(" - Cat files completed: " + catFileCompleted.size());
 		System.out.println(" - ExtCat files arrived: " + extCatFileArrived.size());
