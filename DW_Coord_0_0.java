@@ -28,13 +28,15 @@ public class DW_Coord_0_0 extends ViewableAtomic{
 	private static final String WRITER_DONE = "WriterDone";
 	//out port
 	private static final String EXT_CAT_OUT = "ExtCatOut";
+	private static final String CAT_OUT = "CatOut";
 	private static final String HALT = "halt";
 	//phases
     private static final String PASSIVE = "passive";
 	private static final String HALTING = "halting";
 	private static final String QUEUEING = "QueueingCat";
 	private static final String RECEIVING_EXT_CAT = "ReceivingExtCat";
-	private static final String SENDING = "SendingExtCat";
+	private static final String SEND_EXT_CAT = "SendingExtCat";
+	private static final String SEND_CAT = "SendingCat";
 	private static final String WRITERS_DONE = "WritersDone";
 	
 	private static final String START = "start";
@@ -51,7 +53,6 @@ public class DW_Coord_0_0 extends ViewableAtomic{
 	private Queue catFileQueue;
 	private Queue workingCatFileQueue;
 	private Queue completedCatFileQueue;
-	private Queue processedCatFileQueue;
 	private ExtCatFile currentExtCatFile;
 	private Queue pendingExtCatFileQueue;
 	private Queue workingExtCatFileQueue;
@@ -73,6 +74,7 @@ public class DW_Coord_0_0 extends ViewableAtomic{
 
         // Add output port names
         addOutport(EXT_CAT_OUT);
+        addOutport(CAT_OUT);
         addOutport(HALT);
 
 //add test input ports:
@@ -98,7 +100,7 @@ public class DW_Coord_0_0 extends ViewableAtomic{
         currentCatFile = null;
         catFileQueue = new Queue();
         workingCatFileQueue = new Queue();
-        processedCatFileQueue = new Queue();
+//        processedCatFileQueue = new Queue();
         completedCatFileQueue = new Queue();
         workingExtCatFileQueue = new Queue();
         pendingExtCatFileQueue = new Queue();
@@ -130,16 +132,20 @@ public class DW_Coord_0_0 extends ViewableAtomic{
 				ExtCatFile aCatFile = (ExtCatFile) pair.getValue();
 				CatFile parentCatFile = aCatFile.getParentCatFile();
 				if (parentCatFile.isCompleted()) {
-					processedCatFileQueue.add(parentCatFile);
 					completedCatFileQueue.add(parentCatFile);
 					currentCatFile = null;
+					holdIn(SEND_CAT, 1);
+					outputMessage = new message();
+	        		Pair aPair = new Pair(parentCatFile.getName(), parentCatFile);
+	        		outputMessage.add(makeContent(CAT_OUT, aPair));
 				}
 			}
 		}
-    	if ((phaseIs(PASSIVE) || phaseIs(RECEIVING_EXT_CAT))
+		
+    	if (phaseIs(RECEIVING_EXT_CAT)
     			&& pendingExtCatFileQueue.isEmpty()
     			&& startReceived) {
-    		holdIn(SENDING, 1);
+    		holdIn(SEND_EXT_CAT, 1);
 			this.setBackgroundColor(Color.MAGENTA);
        		sendExtCatToWriters();
     	}
@@ -160,13 +166,6 @@ public class DW_Coord_0_0 extends ViewableAtomic{
 			Pair aPair = new Pair(aWriter.getName(), aCatFile);
 			outputMessage.add(makeContent(EXT_CAT_OUT, aPair));
 		}
-    	for (int i = 0; i < processedCatFileQueue.size(); i++) {
-    		CatFile parentCat = (CatFile) processedCatFileQueue.remove();
-        	if (parentCat != null && parentCat.isCompleted()) {
-        		Pair aPair = new Pair(parentCat.getName(), parentCat);
-        		outputMessage.add(makeContent(EXT_CAT_OUT, aPair));
-        	}
-    	}
 	}
 
 	/**
@@ -288,20 +287,30 @@ public class DW_Coord_0_0 extends ViewableAtomic{
 				passivateIn(PASSIVE);
 				currentExtCatFile = null;
 				this.setBackgroundColor(Color.GRAY);
-			} else if (startReceived){
-	    		holdIn(SENDING, 1);
+			} else if (startReceived) {
+				holdIn(SEND_EXT_CAT, 1);
 				this.setBackgroundColor(Color.MAGENTA);
-	       		sendExtCatToWriters();
+				sendExtCatToWriters();
 			}
 		} else if (phaseIs(WRITERS_DONE)) {
 			passivateIn(PASSIVE);
 			this.setBackgroundColor(Color.GRAY);
-		} else if (phaseIs(SENDING)) {
+		} else if (phaseIs(SEND_EXT_CAT)) {
 			if (catFileQueue.size() == completedCatFileQueue.size()) {
 				holdIn(WRITERS_DONE, 0);
 				this.setBackgroundColor(Color.MAGENTA);
 			} else {
 				sendExtCatToWriters();
+			}
+		} else if (phaseIs(SEND_CAT)) {
+			if (!workingCatFileQueue.isEmpty()) {
+				holdIn(SEND_EXT_CAT, 1);
+				sendExtCatToWriters();
+			} else {
+				if (catFileQueue.size() == completedCatFileQueue.size()) {
+					holdIn(WRITERS_DONE, 0);
+					this.setBackgroundColor(Color.MAGENTA);
+				}
 			}
 		}
     }
@@ -316,7 +325,7 @@ public class DW_Coord_0_0 extends ViewableAtomic{
     // Add output function
     @Override
     public message out(){
-    	if (phaseIs(SENDING)) {
+    	if (phaseIs(SEND_EXT_CAT) || phaseIs(SEND_CAT)) {
     		return outputMessage;
     	}
     	return NULL_MESSAGE;

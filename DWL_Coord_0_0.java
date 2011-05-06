@@ -149,6 +149,7 @@ public class DWL_Coord_0_0 extends ViewableAtomic{
 		}
     	if (phaseIs(PASSIVE) && doneDPReceived) {
     		holdIn(SEND_CAT, 1);
+    		this.setBackgroundColor(Color.GREEN);
     		sendCatFilesToLoaders();
     	}
     }

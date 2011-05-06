@@ -165,6 +165,7 @@ public class Loader_0_0 extends ViewableAtomic {
 			for (int j = 0; j < years.length; j++) {
 				String name = currentCatFile.getName()+summaryLevel+years[j];
 				double regTime = rand.nextInt(5);
+				regTime = regTime == 0 ? 1 : regTime;
 				ExtCatFile aFile = new ExtCatFile(name, 
 						currentCatFile.getNumberOfRecords()/i, summaryLevel, years[j], 1D, regTime);
 				aFile.setParentCatFile(currentCatFile);

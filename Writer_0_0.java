@@ -11,7 +11,6 @@ package DWLProject;
 
 import java.awt.Color;
 
-import model.modeling.content;
 import model.modeling.message;
 import view.modeling.ViewableAtomic;
 import DWLProject.utils.ExtCatFileStatus;
@@ -144,10 +143,9 @@ public class Writer_0_0 extends ViewableAtomic {
 	 */
 	private void prepareOutput() {
 		outputMessage = new message();
-		outputMessage.add(makeContent(EXT_CAT_OUT, currentExtCatFile));
 		Pair thePair = new Pair(this, currentExtCatFile);
-		content theContent = makeContent(DONE, thePair);
-		outputMessage.add(theContent);
+		outputMessage.add(makeContent(EXT_CAT_OUT, thePair));
+		outputMessage.add(makeContent(DONE, thePair));
 	}
 
 	@Override

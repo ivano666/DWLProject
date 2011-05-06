@@ -132,16 +132,6 @@ public class Transducer_0_0 extends ViewableAtomic{
 						}
 						
 					}
-				} else if (val instanceof ExtCatFile) {
-						ExtCatFile extCatFile = (ExtCatFile) val;
-						if (extCatFileArrived.containsKey(extCatFile.getName())) {
-							extCatFileCompleted.put(extCatFile.getName(), extCatFile);
-							totalExtCatTurnAround += clock - extCatFile.getArrivalTime();
-							totalExtCatProcessingTime += extCatFile.getProcessingTime();
-							totalRowsExtCat += extCatFile.getNumberOfRecords();
-						} else {
-							extCatFileArrived.put(extCatFile.getName(), extCatFile);
-						}
 				} else if (val.getName().equals(DP_DONE)) {
 					flatFile.setCompletionTime(clock);
 				}

@@ -26,6 +26,7 @@ public class DW_1_1 extends ViewableDigraph {
 	private static final String HALT = "halt";
 
 	private static final String EXT_CAT_OUT = "ExtCatOut";
+	private static final String CAT_OUT = "CatOut";
 	private int numberOfProcessors;
 
 	// Add Default Constructor
@@ -78,6 +79,7 @@ public class DW_1_1 extends ViewableDigraph {
 		addCoupling(this, LOAD, coordinator, LOAD);
 		addCoupling(this, STOP, coordinator, STOP);
 		addCoupling(coordinator, EXT_CAT_OUT, this, STATS);
+		addCoupling(coordinator, CAT_OUT, this, STATS);
 
 		// Structure information end
 		initialize();
