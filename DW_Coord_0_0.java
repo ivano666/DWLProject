@@ -9,6 +9,7 @@
 // Default Package
 package DWLProject;
 
+import java.awt.Color;
 import java.util.List;
 
 import model.modeling.message;
@@ -139,6 +140,7 @@ public class DW_Coord_0_0 extends ViewableAtomic{
     			&& pendingExtCatFileQueue.isEmpty()
     			&& startReceived) {
     		holdIn(SENDING, 1);
+			this.setBackgroundColor(Color.MAGENTA);
        		sendExtCatToWriters();
     	}
     }
@@ -197,10 +199,12 @@ public class DW_Coord_0_0 extends ViewableAtomic{
     				ExtCatFile aCatFile = (ExtCatFile) value;
     				currentExtCatFile.updateTimeToRegister(e);
     				holdIn(QUEUEING, QUEUEING_TIME);
+        			this.setBackgroundColor(Color.MAGENTA);
     				pendingExtCatFileQueue.add(aCatFile);
     			} else {
     				System.out.println("Not an Ext Cat File: " + value.getName());
     				holdIn(PASSIVE, INFINITY);
+        			this.setBackgroundColor(Color.GRAY);
     			}
     		}
     	}
@@ -220,6 +224,7 @@ public class DW_Coord_0_0 extends ViewableAtomic{
     			if (value instanceof ExtCatFile) {
     				ExtCatFile aCatFile = (ExtCatFile) value;
     				holdIn(RECEIVING_EXT_CAT, aCatFile.getTimeToRegister());
+        			this.setBackgroundColor(Color.MAGENTA);
     				CatFile parent = aCatFile.getParentCatFile();
     				if (!catFileQueue.contains(parent)) {
         				catFileQueue.add(parent);
@@ -230,6 +235,7 @@ public class DW_Coord_0_0 extends ViewableAtomic{
     			else {
     				System.out.println("Not an Ext Cat File: " + value.getName());
     				holdIn(PASSIVE, INFINITY);
+        			this.setBackgroundColor(Color.GRAY);
     			}
     		}
     	}
@@ -245,6 +251,7 @@ public class DW_Coord_0_0 extends ViewableAtomic{
     		entity value = x.getValOnPort(STOP, i);
     		if (value.getName().equals(STOP)) {
     			holdIn(HALTING, 1);
+    			this.setBackgroundColor(Color.MAGENTA);
     			haltMessage = new message();
     			haltMessage.add(makeContent(HALT, new entity(HALT)));
     		}
@@ -257,13 +264,16 @@ public class DW_Coord_0_0 extends ViewableAtomic{
 	public void deltint(){
     	if (phaseIs(HALTING)) {
     		passivateIn(PASSIVE);
+			this.setBackgroundColor(Color.GRAY);
     	} else if (phaseIs(QUEUEING)) {
     		double timeLeftForRegistration = currentExtCatFile.getTimeToRegister();
     		if (timeLeftForRegistration > 0D) {
     			holdIn(RECEIVING_EXT_CAT, timeLeftForRegistration);
+    			this.setBackgroundColor(Color.MAGENTA);
     		} else {
     			currentExtCatFile = null;
     			holdIn(PASSIVE, INFINITY);
+    			this.setBackgroundColor(Color.GRAY);
     		}
 		} else if (phaseIs(RECEIVING_EXT_CAT)) {
 			if (pendingExtCatFileQueue.size() > 0) {
@@ -273,19 +283,23 @@ public class DW_Coord_0_0 extends ViewableAtomic{
 				CatFile parent = currentExtCatFile.getParentCatFile();
 				catFileQueue.add(parent);
 				workingCatFileQueue.add(parent);
+				this.setBackgroundColor(Color.MAGENTA);
 			} else if (workingCatFileQueue.isEmpty()){
 				passivateIn(PASSIVE);
 				currentExtCatFile = null;
+				this.setBackgroundColor(Color.GRAY);
 			} else if (startReceived){
 	    		holdIn(SENDING, 1);
+				this.setBackgroundColor(Color.MAGENTA);
 	       		sendExtCatToWriters();
 			}
-			
 		} else if (phaseIs(WRITERS_DONE)) {
 			passivateIn(PASSIVE);
+			this.setBackgroundColor(Color.GRAY);
 		} else if (phaseIs(SENDING)) {
 			if (catFileQueue.size() == completedCatFileQueue.size()) {
 				holdIn(WRITERS_DONE, 0);
+				this.setBackgroundColor(Color.MAGENTA);
 			} else {
 				sendExtCatToWriters();
 			}

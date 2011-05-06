@@ -9,6 +9,8 @@
 // Default Package
 package DWLProject;
 
+import java.awt.Color;
+
 import model.modeling.content;
 import model.modeling.message;
 import view.modeling.ViewableAtomic;
@@ -110,10 +112,12 @@ public class Writer_0_0 extends ViewableAtomic {
 						currentExtCatFile = (ExtCatFile) aPair.getValue();
 						holdIn(BUSY, currentExtCatFile.getProcessingTime());
 						currentExtCatFile.setStatus(ExtCatFileStatus.INPROGRESS);
+						this.setBackgroundColor(Color.ORANGE);
 					}
 					else {
 						System.out.println("Not an Ext Cat File: " + value.getName());
 						holdIn(PASSIVE, INFINITY);
+						this.setBackgroundColor(Color.GRAY);
 					}
 				}
 			}
@@ -124,12 +128,14 @@ public class Writer_0_0 extends ViewableAtomic {
 	public void deltint() {
 		if (phaseIs(DONE)) {
 			passivateIn(PASSIVE);
+			this.setBackgroundColor(Color.GRAY);
 		}
 		if (phaseIs(BUSY)) {
 			currentExtCatFile.setStatus(ExtCatFileStatus.COMPLETED);
 			currentExtCatFile.getParentCatFile().addProcessedExtCatFile(currentExtCatFile);
 			prepareOutput();
 			holdIn(DONE, 0);
+			this.setBackgroundColor(Color.ORANGE);
 		}
 	}
 

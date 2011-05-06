@@ -9,6 +9,8 @@
 // Default Package
 package DWLProject;
 
+import java.awt.Color;
+
 import model.modeling.message;
 import view.modeling.ViewableAtomic;
 import GenCol.entity;
@@ -90,6 +92,7 @@ public class CommAgent_0_0 extends ViewableAtomic{
 			entity value = x.getValOnPort(START, i);
 			if (value.getName().equals(START)) {
 				holdIn(RECEIVE_FF, 5);
+				this.setBackgroundColor(Color.CYAN);
 			}
 		}
 	}
@@ -116,6 +119,7 @@ public class CommAgent_0_0 extends ViewableAtomic{
     public void deltint(){
     	if (phaseIs(SEND_FF)){
         		passivate();
+        		this.setBackgroundColor(Color.GRAY);
     	};
     }
 

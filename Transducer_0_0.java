@@ -9,6 +9,7 @@
 // Default Package
 package DWLProject;
 
+import java.awt.Color;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -77,6 +78,7 @@ public class Transducer_0_0 extends ViewableAtomic{
     // Add initialize function
     @Override
     public void initialize(){
+		this.setBackgroundColor(Color.YELLOW);
         phase = ACTIVE;
         sigma = INFINITY;
         clock = 0D;
@@ -160,6 +162,7 @@ public class Transducer_0_0 extends ViewableAtomic{
     	clock += sigma;
     	passivate();
     	showCurrentState();
+		this.setBackgroundColor(Color.GRAY);
     }
 
     // Add output function

@@ -9,6 +9,7 @@
 // Default Package
 package DWLProject;
 
+import java.awt.Color;
 import java.util.List;
 
 import model.modeling.message;
@@ -198,10 +199,12 @@ public class DWL_Coord_0_0 extends ViewableAtomic{
 				currentCatFile.updateRegistrationTime(e);
 				holdIn(QUEUEING, QUEUEING_TIME);
 				pendingCatFileQueue.add(aCatFile);
+				this.setBackgroundColor(Color.GREEN);
 			}
 			else {
 				System.out.println("Not a Cat File: " + value.getName());
 				holdIn(PASSIVE, INFINITY);
+				this.setBackgroundColor(Color.GRAY);
 			}
 		}
 	}
@@ -225,10 +228,12 @@ public class DWL_Coord_0_0 extends ViewableAtomic{
 	    				currentCatFile = aCatFile;
 	    				workingCatFileQueue.add(currentCatFile);
 	    				catFileQueue.add(currentCatFile);
+	    				this.setBackgroundColor(Color.GREEN);
 	    			}
 	    			else {
 	    				System.out.println("Not a Cat File: " + value.getName());
 	    				holdIn(PASSIVE, INFINITY);
+	    				this.setBackgroundColor(Color.GRAY);
 	    			}
 	    		}
 			}
@@ -252,10 +257,12 @@ public class DWL_Coord_0_0 extends ViewableAtomic{
 						partitionFileMessage = new message();
 						partitionFileMessage.add(makeContent(FF_OUT, theFlatFile));
 						holdIn(RECEIVE_FF, theFlatFile.getTimeToRegister());
+						this.setBackgroundColor(Color.GREEN);
 					}
 					else {
 						System.out.println("Not a Flat File: " + value.getName());
 						holdIn(PASSIVE, INFINITY);
+						this.setBackgroundColor(Color.GRAY);
 					}
 				}
 			}
@@ -278,6 +285,7 @@ public class DWL_Coord_0_0 extends ViewableAtomic{
 						holdIn(NOTIFY_CA, 0);
 						loadFileMessage = new message();
 						loadFileMessage.add(makeContent(GET_FF, new entity(START)));
+						this.setBackgroundColor(Color.GREEN);
 					}
 				}
 			}
@@ -289,20 +297,25 @@ public class DWL_Coord_0_0 extends ViewableAtomic{
     public void deltint(){
     	if (phaseIs(NOTIFY_CA)) {
     		passivateIn(PASSIVE);
+			this.setBackgroundColor(Color.GRAY);
     	}
     	if (phaseIs(SEND_FF)) {
     		passivateIn(PASSIVE);
+			this.setBackgroundColor(Color.GRAY);
     	}
     	if (phaseIs(RECEIVE_FF)) {
     		holdIn(SEND_FF, 0);
+			this.setBackgroundColor(Color.GREEN);
     	}
     	if (phaseIs(QUEUEING)) {
     		double timeLeftForRegistration = currentCatFile.getTimeToRegister();
     		if (timeLeftForRegistration >= 0D) {
     			holdIn(RECEIVE_CAT, timeLeftForRegistration);
+    			this.setBackgroundColor(Color.GREEN);
     		} else {
     			currentCatFile = null;
     			holdIn(PASSIVE, INFINITY);
+    			this.setBackgroundColor(Color.GRAY);
     		}
     	}
     	if (phaseIs(RECEIVE_CAT)) {
@@ -311,19 +324,23 @@ public class DWL_Coord_0_0 extends ViewableAtomic{
 				workingCatFileQueue.add(currentCatFile);
 				catFileQueue.add(currentCatFile);
 				holdIn(RECEIVE_CAT, currentCatFile.getTimeToRegister());
+				this.setBackgroundColor(Color.GREEN);
 			} else {
 				passivateIn(PASSIVE);
 				currentCatFile = null;
+				this.setBackgroundColor(Color.GRAY);
 			}
     	}
     	if (phaseIs(LDRS_DONE)) {
     		passivateIn(PASSIVE);
+			this.setBackgroundColor(Color.GRAY);
     	}
     	if (phaseIs(SEND_CAT)) {
     		if (catFileQueue.size() == completedCatQueue.size()) {
     			holdIn(LDRS_DONE, 0);
         		loadersDoneMessage = new message();
         		loadersDoneMessage.add(makeContent(LOAD, new entity("start")));
+    			this.setBackgroundColor(Color.GREEN);
     		} else {
     			sendCatFilesToLoaders();
     		}

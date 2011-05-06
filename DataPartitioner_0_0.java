@@ -9,6 +9,7 @@
 // Default Package
 package DWLProject;
 
+import java.awt.Color;
 import java.util.Random;
 
 import model.modeling.message;
@@ -89,11 +90,15 @@ public class DataPartitioner_0_0 extends ViewableAtomic {
 				if (flatFile.getNumberOfCategories() < 0) {
 					System.out.println("Invalid Flat File: # of Categories must be > 1");
 					holdIn(PASSIVE, INFINITY);
-				} else
+					this.setBackgroundColor(Color.GRAY);
+				} else {
 					holdIn(RECEIVE_FF, flatFile.getTimeToRegister());
+					this.setBackgroundColor(Color.PINK);
+				}
 			} else {
 				System.out.println("Not a Flat File: " + value.getName());
 				holdIn(PASSIVE, INFINITY);
+				this.setBackgroundColor(Color.GRAY);
 			}
 		}
 	}
@@ -102,6 +107,7 @@ public class DataPartitioner_0_0 extends ViewableAtomic {
 	public void deltint() {
 		if (phaseIs(RECEIVE_FF)) {
 			holdIn(CREATE_CAT, 10);
+			this.setBackgroundColor(Color.PINK);
 		} else if (phaseIs(CREATE_CAT)) {
 			Random rand = new Random();
 			int recs = flatFile.getNumberOfRecords();
@@ -169,23 +175,29 @@ public class DataPartitioner_0_0 extends ViewableAtomic {
 			holdIn(SEND_CAT, 10);
 		} else if (phaseIs(SEND_CAT)) {
 			holdIn(CHECK_ERRORS, 10);
+			this.setBackgroundColor(Color.PINK);
 		} else if (phaseIs(CHECK_ERRORS)) {
 			if (errors != 0) {
 				ErrorFile ef = new ErrorFile(errors, 10D);
 				errorFileMessage = new message();
 				errorFileMessage.add(makeContent(ERROR_FILE, ef));
 				holdIn(SEND_ERRORS, 10);
+				this.setBackgroundColor(Color.PINK);
 			} else {
 				doneMessage = new message();
 				doneMessage.add(makeContent(DP_DONE, new entity(DP_DONE)));
 				holdIn(ENDING, 1);
+				this.setBackgroundColor(Color.PINK);
 			}
 		} else if (phaseIs(SEND_ERRORS)) {
 			doneMessage = new message();
 			doneMessage.add(makeContent(DP_DONE, new entity(DP_DONE)));
 			holdIn(ENDING, 1);
-		} else
+			this.setBackgroundColor(Color.PINK);
+		} else {
 			passivate();
+			this.setBackgroundColor(Color.GRAY);
+		}
 	}
 
 	// Add confluent function

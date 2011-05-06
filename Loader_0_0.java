@@ -9,6 +9,7 @@
 // Default Package
 package DWLProject;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -109,10 +110,12 @@ public class Loader_0_0 extends ViewableAtomic {
 					if (aPair.getValue() instanceof CatFile) {
 						currentCatFile = (CatFile) aPair.getValue();
 						holdIn(BUSY, currentCatFile.getTimeToRegister());
+						this.setBackgroundColor(Color.ORANGE);
 					}
 					else {
 						System.out.println("Not a Cat File: " + value.getName());
 						holdIn(PASSIVE, INFINITY);
+						this.setBackgroundColor(Color.GRAY);
 					}
 				}
 			}
@@ -123,9 +126,11 @@ public class Loader_0_0 extends ViewableAtomic {
 	public void deltint() {
 		if (phaseIs(SENDING)){
 			passivateIn(PASSIVE);
+			this.setBackgroundColor(Color.GRAY);
 		}
 		if(phaseIs(BUSY)) {
 			holdIn(SENDING, 0);
+			this.setBackgroundColor(Color.ORANGE);
 			List<ExtCatFile> theFiles = createExtCatFiles();
 			prepareOutput(theFiles);
 		}
