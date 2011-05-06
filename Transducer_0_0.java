@@ -46,15 +46,17 @@ public class Transducer_0_0 extends ViewableAtomic{
 	private double totalExtCatProcessingTime;
 	private int totalRowsCat;
 	private int totalRowsExtCat;
+	private double observationTime;
 
     // Add Default Constructor
     public Transducer_0_0(){
-        this("Transducer_0_0", 10D);
+        this("Transducer", 10D);
     }
 
     // Add Parameterized Constructors
     public Transducer_0_0(String name, double observationTime){
         super(name);
+        this.observationTime = observationTime;
 // Structure information start
         // Add input port names
         addInport(STATS);
@@ -80,7 +82,7 @@ public class Transducer_0_0 extends ViewableAtomic{
     public void initialize(){
 		this.setBackgroundColor(Color.YELLOW);
         phase = ACTIVE;
-        sigma = INFINITY;
+        sigma = observationTime;
         clock = 0D;
         catFilesArrived = new HashMap<String, CatFile>();
         catFileCompleted = new HashMap<String, CatFile>();
@@ -159,29 +161,29 @@ public class Transducer_0_0 extends ViewableAtomic{
     @Override
     public message out(){
     	message output = new message();
-    	content aContent = makeContent(MEASURES, new Pair(" - Cat files arrived: ", catFilesArrived.size()));
+    	content aContent = makeContent(MEASURES, new entity(" - Cat files arrived: " + catFilesArrived.size()));
     	output.add(aContent);
-    	aContent = makeContent(MEASURES, new Pair(" - Cat files completed: ", catFileCompleted.size()));
+    	aContent = makeContent(MEASURES, new entity(" - Cat files completed: " + catFileCompleted.size()));
     	output.add(aContent);
-    	aContent = makeContent(MEASURES, new Pair(" - ExtCat files arrived: ", extCatFileArrived.size()));
+    	aContent = makeContent(MEASURES, new entity(" - ExtCat files arrived: " + extCatFileArrived.size()));
     	output.add(aContent);
-    	aContent = makeContent(MEASURES, new Pair(" - ExtCat files completed: ", extCatFileCompleted.size()));
+    	aContent = makeContent(MEASURES, new entity(" - ExtCat files completed: " + extCatFileCompleted.size()));
     	output.add(aContent);
-    	aContent = makeContent(MEASURES, new Pair(" - # Rows: ", flatFile.getNumberOfRecords()));
+    	aContent = makeContent(MEASURES, new entity(" - # Rows: " + flatFile.getNumberOfRecords()));
     	output.add(aContent);
-    	aContent = makeContent(MEASURES, new Pair(" - # Errors: ", errorFile.getNumberOfRecords()));
+    	aContent = makeContent(MEASURES, new entity(" - # Errors: " + errorFile.getNumberOfRecords()));
     	output.add(aContent);
-    	aContent = makeContent(MEASURES, new Pair(" - Avg Cat file turnaround time: ", computeCatAvgTA()));
+    	aContent = makeContent(MEASURES, new entity(" - Avg Cat file turnaround time: " + computeCatAvgTA()));
     	output.add(aContent);
-    	aContent = makeContent(MEASURES, new Pair(" - Avg ExtCat file turnaround time: ", computeExtCatAvgTA()));
+    	aContent = makeContent(MEASURES, new entity(" - Avg ExtCat file turnaround time: " + computeExtCatAvgTA()));
     	output.add(aContent);
-    	aContent = makeContent(MEASURES, new Pair(" - Avg Cat file processing time: ", computeCatAvgPT()));
+    	aContent = makeContent(MEASURES, new entity(" - Avg Cat file processing time: " + computeCatAvgPT()));
     	output.add(aContent);
-    	aContent = makeContent(MEASURES, new Pair(" - Avg ExtCat file processing time: ", computeExtCatAvgPT()));
+    	aContent = makeContent(MEASURES, new entity(" - Avg ExtCat file processing time: " + computeExtCatAvgPT()));
     	output.add(aContent);
-    	aContent = makeContent(MEASURES, new Pair(" - Avg #Rows Per Cat file: ", computeCatAvgRows()));
+    	aContent = makeContent(MEASURES, new entity(" - Avg #Rows Per Cat file: " + computeCatAvgRows()));
     	output.add(aContent);
-    	aContent = makeContent(MEASURES, new Pair(" - Avg #Rows Per ExtCat file: ", computeExtCatAvgRows()));
+    	aContent = makeContent(MEASURES, new entity(" - Avg #Rows Per ExtCat file: " + computeExtCatAvgRows()));
     	output.add(aContent);
     	
     	return output;

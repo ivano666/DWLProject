@@ -132,17 +132,19 @@ public class DW_Coord_0_0 extends ViewableAtomic{
 				ExtCatFile aCatFile = (ExtCatFile) pair.getValue();
 				CatFile parentCatFile = aCatFile.getParentCatFile();
 				if (parentCatFile.isCompleted()) {
-					completedCatFileQueue.add(parentCatFile);
-					currentCatFile = null;
-					holdIn(SEND_CAT, 1);
-					outputMessage = new message();
-	        		Pair aPair = new Pair(parentCatFile.getName(), parentCatFile);
-	        		outputMessage.add(makeContent(CAT_OUT, aPair));
+					if (!completedCatFileQueue.contains(parentCatFile)) {
+						completedCatFileQueue.add(parentCatFile);
+						currentCatFile = null;
+						holdIn(SEND_CAT, 1);
+						outputMessage = new message();
+		        		Pair aPair = new Pair(parentCatFile.getName(), parentCatFile);
+		        		outputMessage.add(makeContent(CAT_OUT, aPair));
+					}
 				}
 			}
 		}
 		
-    	if (phaseIs(RECEIVING_EXT_CAT)
+    	if ((phaseIs(PASSIVE) || phaseIs(RECEIVING_EXT_CAT))
     			&& pendingExtCatFileQueue.isEmpty()
     			&& startReceived) {
     		holdIn(SEND_EXT_CAT, 1);
@@ -280,8 +282,10 @@ public class DW_Coord_0_0 extends ViewableAtomic{
 				holdIn(RECEIVING_EXT_CAT,
 						currentExtCatFile.getTimeToRegister());
 				CatFile parent = currentExtCatFile.getParentCatFile();
-				catFileQueue.add(parent);
-				workingCatFileQueue.add(parent);
+				if (!catFileQueue.contains(parent)) {
+					catFileQueue.add(parent);
+					workingCatFileQueue.add(parent);
+				}
 				this.setBackgroundColor(Color.MAGENTA);
 			} else if (workingCatFileQueue.isEmpty()){
 				passivateIn(PASSIVE);

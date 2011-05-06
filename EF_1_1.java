@@ -9,16 +9,15 @@ package DWLProject;
 import java.awt.Dimension;
 import java.awt.Point;
 
-import DWLProject.utils.DWLProperties;
-
 import view.modeling.ViewableAtomic;
 import view.modeling.ViewableComponent;
 import view.modeling.ViewableDigraph;
+import DWLProject.utils.DWLProperties;
 
 /**
  * EF_1_1.java
  * 
- * @author CosMos, Ivan C, Enrique V
+ * @author CosMos, Ivan C, Enrique H
  *
  */
 public class EF_1_1 extends ViewableDigraph {
@@ -27,7 +26,7 @@ public class EF_1_1 extends ViewableDigraph {
 
 	// Add Default Constructor
 	public EF_1_1() {
-		this("EF_1_1");
+		this("EF");
 	}
 
 	// Add Parameterized Constructor
@@ -49,7 +48,7 @@ public class EF_1_1 extends ViewableDigraph {
 		// Initialize sub-components
 		ViewableAtomic generator_1_0 = new generator_0_0("Generator", 10);
 		observationTime = Double.valueOf(DWLProperties.getInstance().getValue("ObservationTime"));
-		ViewableAtomic transducer_1_0 = new Transducer_0_0("Transducer_1_0",
+		ViewableAtomic transducer_1_0 = new Transducer_0_0("Transducer",
 				observationTime);
 
 		// Add sub-components
@@ -60,7 +59,7 @@ public class EF_1_1 extends ViewableDigraph {
 		addCoupling(generator_1_0, "FFout", this, "FFout");
 		addCoupling(generator_1_0, "start", this, "start");
 		addCoupling(this, "stats", transducer_1_0, "stats");
-		addCoupling(this, "ErrorFile", transducer_1_0, "ErrorFile");
+		addCoupling(this, "errorFile", transducer_1_0, "errorFile");
 		addCoupling(transducer_1_0, "measures", this, "measures");
 
 		// Structure information end
@@ -74,7 +73,7 @@ public class EF_1_1 extends ViewableDigraph {
     public void layoutForSimView()
     {
         preferredSize = new Dimension(367, 471);
-        ((ViewableComponent)withName("Transducer_1_0")).setPreferredLocation(new Point(-11, 234));
+        ((ViewableComponent)withName("Transducer")).setPreferredLocation(new Point(-11, 234));
         ((ViewableComponent)withName("Generator")).setPreferredLocation(new Point(64, 30));
     }
 }
