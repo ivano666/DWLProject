@@ -60,10 +60,10 @@ public class generator_0_0 extends ViewableAtomic {
 	public void deltint() {
 		if (phaseIs(READY)) {
 			holdIn(START_DW, 1);
-			this.setBackgroundColor(Color.DARK_GRAY);
+			this.setBackgroundColor(Color.MAGENTA);
 		} else if (phaseIs(START_DW)) {
 			holdIn(SEND_FF, 0);
-			this.setBackgroundColor(Color.DARK_GRAY);
+			this.setBackgroundColor(Color.MAGENTA);
 		} else if (phaseIs(SEND_FF)) {
 			passivate();
 			this.setBackgroundColor(Color.GRAY);
