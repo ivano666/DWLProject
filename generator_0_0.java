@@ -13,7 +13,7 @@ import model.modeling.content;
 import model.modeling.message;
 import view.modeling.ViewableAtomic;
 import GenCol.entity;
-
+import DWLProject.utils.DWLProperties;
 
 /**
  * 
@@ -24,10 +24,10 @@ public class generator_0_0 extends ViewableAtomic {
 
 	protected double int_arr_time;
 	protected int count;
-	protected int records = 1000;
-	protected int errors = 0;
-	protected int categories = 5;
-	protected int numberOfYears = 1;
+	protected int records = Integer.valueOf(DWLProperties.getInstance().getValue("NumberOfRecords"));
+	protected int errors = Integer.valueOf(DWLProperties.getInstance().getValue("NumberOfErrors"));
+	protected int categories = Integer.valueOf(DWLProperties.getInstance().getValue("NumberOfCategories"));
+	protected int numberOfYears = Integer.valueOf(DWLProperties.getInstance().getValue("NumberOfYears"));
 
 	// Phases
 	private static final String READY = "ready";
@@ -93,7 +93,7 @@ public class generator_0_0 extends ViewableAtomic {
 
 	public String getTooltipText() {
 		return super.getTooltipText() + "\n" + " #Records: " + records + "\n"
-				+ " #Categories: " + categories + "\n" + " #Errors: " + errors;
+			+ " #Errors: " + errors + "\n" + "  #Categories: " + categories + "\n";
 	}
 
 }
