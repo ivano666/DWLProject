@@ -234,6 +234,9 @@ public class Loader_0_0 extends ViewableAtomic {
 		myBuilder.append("\n");
 		myBuilder.append("Ext Cat File: ");
 		myBuilder.append(currentCatFile != null ? currentCatFile : EMPTY_STRING);
-		return super.getTooltipText() + myBuilder.toString();
+		if(phaseIs(PASSIVE))
+			return super.getTooltipText();
+		else
+			return super.getTooltipText() + myBuilder.toString();
 	}
 }

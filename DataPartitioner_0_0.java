@@ -13,20 +13,24 @@ import java.util.Random;
 
 import model.modeling.message;
 import view.modeling.ViewableAtomic;
+import DWLProject.utils.DWLProperties;
 import GenCol.entity;
 
 public class DataPartitioner_0_0 extends ViewableAtomic {
 	private FlatFile flatFile;
 	private CatFile aCatFile;
 	private int[] catNumRecords, catDims, catSumLevels, catYears;
-	private int MAX_DIMENSIONS = 3;
-	private int MAX_SUMLEVELS = 1;
-	private int errors;
+	private int MAX_DIMENSIONS = Integer.valueOf(DWLProperties.getInstance().getValue("MAX_DIMENSIONS"));
+	private int MAX_SUMLEVELS = Integer.valueOf(DWLProperties.getInstance().getValue("MAX_SUMLEVELS"));;
 
+//Declare cats, years, HERE
+	private  int cats, recs, validRecs, years, errors, totalRecsAssigned; 
 	private static final String FF_IN = "FFin";
 	private static final String CAT_FILE_OUT = "CatFileOut";
 	private static final String ERROR_FILE = "errorFile";
 	private static final String DP_DONE = "DPDone";
+	private static final String nL = "\n";
+	private static String ttText = "";
 
 	// Phases
 	private static final String PASSIVE = "passive";
@@ -104,27 +108,21 @@ public class DataPartitioner_0_0 extends ViewableAtomic {
 			holdIn(CREATE_CAT, 10);
 		} else if (phaseIs(CREATE_CAT)) {
 			Random rand = new Random();
-			int recs = flatFile.getNumberOfRecords();
+			recs = flatFile.getNumberOfRecords();
 			int randDimsInCat;
 			int randSumLevelsInCat;
-			int cats = flatFile.getNumberOfCategories();
+			cats = flatFile.getNumberOfCategories();
 			errors = flatFile.getNumberOfErrors();
-			int years = flatFile.getNumberOfYears();
+			years = flatFile.getNumberOfYears();
 			int randYearsInCat;
-			int validRecs = recs - errors;
+			validRecs = recs - errors;
 			int remainingRecords = validRecs;
-			int totalRecsAssigned = 0;
+			totalRecsAssigned = 0;
 
 			// Fill CAT arrays with random numbers when appropriate
-			// int numberOfRecords;
-			// int dimensions;
-			// int summaryLevels;
-			// Fill CAT Number of Records Array
 			catNumRecords = new int[cats];
 			for (int i = 0; i < cats; i++) {
-				if (i == cats - 1 && remainingRecords > 0) // ensure the total
-															// of records are
-															// assigned
+				if (i == cats - 1 && remainingRecords > 0) // ensure the total of records are assigned 
 					catNumRecords[i] = remainingRecords;
 				else
 					catNumRecords[i] = rand.nextInt(validRecs + 1);
@@ -132,8 +130,7 @@ public class DataPartitioner_0_0 extends ViewableAtomic {
 				remainingRecords -= totalRecsAssigned;
 			}
 			;
-			// Fill CAT Number of Dimensions Array (Any category may have from 1
-			// to MAX_DIMENSIONS)
+			// Fill CAT Number of Dimensions Array (Any category may have from 1 to MAX_DIMENSIONS)
 			catDims = new int[cats];
 			for (int i = 0; i < cats; i++) {
 				randDimsInCat = rand.nextInt(MAX_DIMENSIONS);
@@ -161,9 +158,13 @@ public class DataPartitioner_0_0 extends ViewableAtomic {
 				String catName = "CAT" + i;
 				double regTime = rand.nextInt(5);
 				regTime = Double.compare(regTime, 0D) == 1 ? regTime : 1D;
-				aCatFile = new CatFile(catName, catNumRecords[i], regTime,
+				if (catNumRecords[i]>0){
+					aCatFile = new CatFile(catName, catNumRecords[i], regTime,
 						catDims[i], catSumLevels[i], catYears[i]);
-				catFileMessage.add(makeContent(CAT_FILE_OUT, aCatFile));
+					catFileMessage.add(makeContent(CAT_FILE_OUT, aCatFile));
+					ttText = ttText + catName + " #recs: " + catNumRecords[i] + " #dims: "+ catDims[i] + 
+					" #SummLevels: " + catSumLevels[i]+ " #years: " + catYears[i]+nL;
+				}
 			}
 
 			holdIn(SEND_CAT, 10);
@@ -206,4 +207,19 @@ public class DataPartitioner_0_0 extends ViewableAtomic {
 	}
 
 	// Add Show State function
+
+	public String getTooltipText() {
+		if (phaseIs(SEND_CAT)){
+		    return super.getTooltipText() + "\n" +
+		    ttText;
+         }
+		else 
+			if (phaseIs(SEND_ERRORS))
+			{
+				ttText = "#Valid records: " + validRecs + " #Errors: " + errors;
+			    return super.getTooltipText() + "\n" +
+			    ttText;
+			}
+			return super.getTooltipText();
+	}
 }
