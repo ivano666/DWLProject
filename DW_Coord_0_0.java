@@ -295,7 +295,7 @@ public class DW_Coord_0_0 extends ViewableAtomic{
 				currentExtCatFile = null;
 				this.setBackgroundColor(Color.GRAY);
 			} else if (startReceived) {
-				holdIn(SEND_EXT_CAT, 1);
+				holdIn(SEND_EXT_CAT, 0);
 				this.setBackgroundColor(Color.MAGENTA);
 				sendExtCatToWriters();
 			}
@@ -308,17 +308,12 @@ public class DW_Coord_0_0 extends ViewableAtomic{
 				this.setBackgroundColor(Color.MAGENTA);
 			} else {
 				holdIn(PASSIVE, INFINITY);
-    			this.setBackgroundColor(Color.GREEN);
+    			this.setBackgroundColor(Color.GRAY);
 			}
 		} else if (phaseIs(SEND_CAT)) {
-			if (!workingCatFileQueue.isEmpty()) {
-				holdIn(SEND_EXT_CAT, 0);
-				sendExtCatToWriters();
-			} else {
-				if (catFileQueue.size() == completedCatFileQueue.size()) {
-					holdIn(WRITERS_DONE, 0);
-					this.setBackgroundColor(Color.MAGENTA);
-				}
+			if (catFileQueue.size() == completedCatFileQueue.size()) {
+				holdIn(WRITERS_DONE, 0);
+				this.setBackgroundColor(Color.MAGENTA);
 			}
 		}
     }
