@@ -113,7 +113,11 @@ public class DataPartitioner_0_0 extends ViewableAtomic {
 	// Add internal transition function
 	public void deltint() {
 		if (phaseIs(RECEIVE_FF)) {
-			holdIn(CREATE_CAT, 10);
+			double processingTime = DWLUtils.DEFAULT_PROCESSING_TIME;
+			if (Double.compare(PROCESSING_FACTOR_CAT, 0D) > 0) {
+				processingTime = Math.max(processingTime, flatFile.getNumberOfRecords()/PROCESSING_FACTOR_CAT);
+			} 
+			holdIn(CREATE_CAT, processingTime);
 			this.setBackgroundColor(Color.PINK);
 		} else if (phaseIs(CREATE_CAT)) {
 			//Random rand = new Random();
@@ -193,11 +197,12 @@ public class DataPartitioner_0_0 extends ViewableAtomic {
 			for (int i = 0; i < cats; i++) {
 				String catName = "CAT" + i;
 				//double regTime = rand.nextInt(5);
-				double processingTime;
-				if (Double.compare(PROCESSING_FACTOR_CAT, 0D) > 0) 
-					processingTime = Double.valueOf(catNumRecords[i])/PROCESSING_FACTOR_CAT;
-				else 
-					processingTime = DWLUtils.DEFAULT_PROCESSING_TIME;
+				double processingTime = DWLUtils.DEFAULT_PROCESSING_TIME;;
+				if (Double.compare(PROCESSING_FACTOR_CAT, 0D) > 0) {
+					for (int k = 1; k <= MAX_SUMLEVELS; k++) {
+						processingTime = Math.max(processingTime, Double.valueOf(catNumRecords[i])/(k *PROCESSING_FACTOR_CAT));
+					}
+				}
 				
 				if (catNumRecords[i]>0){
 					aCatFile = new CatFile(catName, catNumRecords[i], DWLUtils.DEFAULT_REGISTRATION_TIME,
@@ -209,16 +214,16 @@ public class DataPartitioner_0_0 extends ViewableAtomic {
 					" #SummLevels: " + MAX_SUMLEVELS+ " #years: " + YEARS+nL;
 				}
 			}
-			holdIn(SEND_CAT, 10);
+			holdIn(SEND_CAT, 1);
 		} else if (phaseIs(SEND_CAT)) {
-			holdIn(CHECK_ERRORS, 10);
+			holdIn(CHECK_ERRORS, 1);
 			this.setBackgroundColor(Color.PINK);
 		} else if (phaseIs(CHECK_ERRORS)) {
 			if (errors != 0) {
-				ErrorFile ef = new ErrorFile(errors, 10D);
+				ErrorFile ef = new ErrorFile(errors, DWLUtils.DEFAULT_REGISTRATION_TIME);
 				errorFileMessage = new message();
 				errorFileMessage.add(makeContent(ERROR_FILE, ef));
-				holdIn(SEND_ERRORS, 10);
+				holdIn(SEND_ERRORS, 1);
 				this.setBackgroundColor(Color.PINK);
 			} else {
 				doneMessage = new message();

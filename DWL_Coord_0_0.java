@@ -153,10 +153,13 @@ public class DWL_Coord_0_0 extends ViewableAtomic{
 				loadersQueue.add(pair.getKey());
 				CatFile aCatFile = (CatFile) pair.getValue();
 				completedCatQueue.add(aCatFile);
+	    		holdIn(SEND_CAT, 0);
+	    		this.setBackgroundColor(Color.GREEN);
+	    		sendCatFilesToLoaders();
 			}
 		}
     	if (phaseIs(PASSIVE) && doneDPReceived) {
-    		holdIn(SEND_CAT, 1);
+    		holdIn(SEND_CAT, 0);
     		this.setBackgroundColor(Color.GREEN);
     		sendCatFilesToLoaders();
     	}
@@ -369,7 +372,8 @@ public class DWL_Coord_0_0 extends ViewableAtomic{
         		loadersDoneMessage.add(makeContent(LOAD, new entity("start")));
     			this.setBackgroundColor(Color.GREEN);
     		} else {
-    			sendCatFilesToLoaders();
+    			passivateIn(PASSIVE);
+    			this.setBackgroundColor(Color.GRAY);
     		}
     	}
     }

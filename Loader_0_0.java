@@ -166,11 +166,10 @@ public class Loader_0_0 extends ViewableAtomic {
 			for (int j = 0; j < years.length; j++) {
 				final String name = currentCatFile.getName()+summaryLevel+years[j];
 				int numberOfRecords = currentCatFile.getNumberOfRecords()/i;
-				double processingTime;
-				if (Double.compare(processingFactor, 0D) > 0)
-					processingTime = numberOfRecords/processingFactor;
-				else
-					processingTime = DWLUtils.DEFAULT_PROCESSING_TIME;
+				double processingTime = DWLUtils.DEFAULT_PROCESSING_TIME;;
+				if (Double.compare(processingFactor, 0D) > 0) {
+					processingTime = Math.max(processingTime, numberOfRecords/processingFactor);
+				}
 				ExtCatFile aFile = new ExtCatFile(name, 
 						numberOfRecords, summaryLevel, years[j], processingTime, DWLUtils.DEFAULT_REGISTRATION_TIME);
 				aFile.setParentCatFile(currentCatFile);

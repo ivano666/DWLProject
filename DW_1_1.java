@@ -104,7 +104,6 @@ public class DW_1_1 extends ViewableDigraph {
     {
         preferredSize = new Dimension(475, 473);
         ((ViewableComponent)withName("Writer_1")).setPreferredLocation(new Point(27, 252));
-        ((ViewableComponent)withName("Writer_2")).setPreferredLocation(new Point(27, 319));
         ((ViewableComponent)withName("Coordinator")).setPreferredLocation(new Point(16, 71));
     }
 }

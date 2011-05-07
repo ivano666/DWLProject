@@ -22,6 +22,7 @@ import GenCol.entity;
  */
 public class generator_0_0 extends ViewableAtomic {
 
+	private static final double FF_REGISTRATION_TIME = 1D;
 	protected double int_arr_time;
 	protected int count;
 	protected int records = Integer.valueOf(DWLProperties.getInstance().getValue("NumberOfRecords"));
@@ -77,11 +78,7 @@ public class generator_0_0 extends ViewableAtomic {
 			content con = makeContent("start", new entity("start"));
 			m.add(con);
 		} else if (phaseIs(SEND_FF)) {
-			FlatFile ff = new FlatFile();
-			ff.setNumberOfRecords(records);
-			ff.setNumberOfErrors(errors);
-			ff.setNumberOfCategories(categories);
-			ff.setNumberOfYears(numberOfYears);
+			FlatFile ff = new FlatFile(records, errors, categories, numberOfYears, FF_REGISTRATION_TIME);
 			m.add(makeContent("FFout", ff));
 		}
 		return m;

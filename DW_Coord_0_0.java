@@ -141,15 +141,18 @@ public class DW_Coord_0_0 extends ViewableAtomic{
 		        		outputMessage.add(makeContent(CAT_OUT, aPair));
 					}
 				}
+				holdIn(SEND_EXT_CAT, 0);
+				this.setBackgroundColor(Color.MAGENTA);
+	    		sendExtCatToWriters();
 			}
 		}
 		
     	if ((phaseIs(PASSIVE) || phaseIs(RECEIVING_EXT_CAT))
     			&& pendingExtCatFileQueue.isEmpty()
     			&& startReceived) {
-    		holdIn(SEND_EXT_CAT, 1);
+    		holdIn(SEND_EXT_CAT, 0);
+    		sendExtCatToWriters();
 			this.setBackgroundColor(Color.MAGENTA);
-       		sendExtCatToWriters();
     	}
     }
 
@@ -304,11 +307,12 @@ public class DW_Coord_0_0 extends ViewableAtomic{
 				holdIn(WRITERS_DONE, 0);
 				this.setBackgroundColor(Color.MAGENTA);
 			} else {
-				sendExtCatToWriters();
+				holdIn(PASSIVE, INFINITY);
+    			this.setBackgroundColor(Color.GREEN);
 			}
 		} else if (phaseIs(SEND_CAT)) {
 			if (!workingCatFileQueue.isEmpty()) {
-				holdIn(SEND_EXT_CAT, 1);
+				holdIn(SEND_EXT_CAT, 0);
 				sendExtCatToWriters();
 			} else {
 				if (catFileQueue.size() == completedCatFileQueue.size()) {
