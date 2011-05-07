@@ -13,20 +13,21 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Random;
 
 import model.modeling.content;
 import model.modeling.message;
 import view.modeling.ViewableAtomic;
+import DWLProject.utils.DWLProperties;
+import DWLProject.utils.DWLUtils;
 import GenCol.Pair;
 import GenCol.entity;
 
 public class Loader_0_0 extends ViewableAtomic {
+	private static final String PROCESSING_FACTOR_WRITE = "processingFactorWrite";
 	private static final String EMPTY_STRING = " ";
-
 	private static final message NULL_MESSAGE = new message();
-
 	private static final String SUMMARY_LEVEL_PREFIX = "L";
+	
 	//Output ports
 	private static final String EXT_CAT_OUT = "extcatout";
 	private static final String DONE = "done";
@@ -63,10 +64,10 @@ public class Loader_0_0 extends ViewableAtomic {
 		addOutport(EXT_CAT_OUT);
 
 		// add test input ports:
-		CatFile someFile = new CatFile("Cat1", 10, 10, 3, 1, 1);
+		CatFile someFile = new CatFile("Cat1", 10, 10, 3, 1, 1, 1D);
 		Pair aPair = new Pair(getName(), someFile);
         addTestInput(CAT_IN, aPair);
-		someFile = new CatFile("Cat2", 10, 10, 3, 1, 2);
+		someFile = new CatFile("Cat2", 10, 10, 3, 1, 2, 1D);
 		aPair = new Pair(getName(), someFile);
 		addTestInput(CAT_IN, aPair);
 
@@ -109,7 +110,7 @@ public class Loader_0_0 extends ViewableAtomic {
 				if (aPair.getKey().equals(this.getName())) {
 					if (aPair.getValue() instanceof CatFile) {
 						currentCatFile = (CatFile) aPair.getValue();
-						holdIn(BUSY, currentCatFile.getTimeToRegister());
+						holdIn(BUSY, currentCatFile.getProcessingTime());
 						this.setBackgroundColor(Color.ORANGE);
 					}
 					else {
@@ -157,17 +158,21 @@ public class Loader_0_0 extends ViewableAtomic {
 	 * @return
 	 */
 	private List<ExtCatFile> createExtCatFiles() {
-		Random rand = new Random();
+		final double processingFactor = Double.valueOf(DWLProperties.getInstance().getValue(PROCESSING_FACTOR_WRITE));
 		List<ExtCatFile> theFiles = new ArrayList<ExtCatFile>(currentCatFile.getNumberOfSummaryLevels()); 
 		for (int i = 1; i <= currentCatFile.getNumberOfSummaryLevels(); i++) {
 			String summaryLevel = SUMMARY_LEVEL_PREFIX+i;
 			int[] years = getYears(currentCatFile.getYears());
 			for (int j = 0; j < years.length; j++) {
-				String name = currentCatFile.getName()+summaryLevel+years[j];
-				double regTime = rand.nextInt(5);
-				regTime = regTime == 0 ? 1 : regTime;
+				final String name = currentCatFile.getName()+summaryLevel+years[j];
+				int numberOfRecords = currentCatFile.getNumberOfRecords()/i;
+				double processingTime;
+				if (Double.compare(processingFactor, 0D) > 0)
+					processingTime = numberOfRecords/processingFactor;
+				else
+					processingTime = DWLUtils.DEFAULT_PROCESSING_TIME;
 				ExtCatFile aFile = new ExtCatFile(name, 
-						currentCatFile.getNumberOfRecords()/i, summaryLevel, years[j], 1D, regTime);
+						numberOfRecords, summaryLevel, years[j], processingTime, DWLUtils.DEFAULT_REGISTRATION_TIME);
 				aFile.setParentCatFile(currentCatFile);
 				theFiles.add(aFile);
 				currentCatFile.addExtCatFile(aFile);

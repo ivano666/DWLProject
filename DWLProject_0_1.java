@@ -21,6 +21,7 @@ public class DWLProject_0_1 extends ViewableDigraph{
     private static final String FF_OUT = "FFout";
 	private static final String LOAD = "load";
 	private static final String START = "start";
+	private static final String STOP = "stop";
 	private static final String FF_IN = "FFin";
 	private static final String STATS = "stats";
 	private static final String ERROR_FILE = "errorFile";
@@ -61,9 +62,10 @@ public class DWLProject_0_1 extends ViewableDigraph{
         addCoupling(EF_1_1, START, DWL_1_1, START);
         addCoupling(DW_1_1, STATS, EF_1_1, STATS);
         addCoupling(DWL_1_1, ERROR_FILE, EF_1_1, ERROR_FILE);
-        addCoupling(DW_1_1, HALT, DWL_1_1, HALT);
+        addCoupling(DW_1_1, HALT, DWL_1_1, STOP);
         addCoupling(DWL_1_1, STATS, EF_1_1, STATS);
         addCoupling(DWL_1_1, EXT_CAT_OUT, DW_1_1, EXT_CAT_IN);
+        addCoupling(DWL_1_1, HALT, EF_1_1, STATS);
 
 // Structure information end
         initialize();
@@ -76,8 +78,8 @@ public class DWLProject_0_1 extends ViewableDigraph{
     public void layoutForSimView()
     {
         preferredSize = new Dimension(1609, 549);
-        ((ViewableComponent)withName("DW")).setPreferredLocation(new Point(1103, 52));
         ((ViewableComponent)withName("DWL")).setPreferredLocation(new Point(435, 51));
+        ((ViewableComponent)withName("DW")).setPreferredLocation(new Point(1103, 52));
         ((ViewableComponent)withName("EF")).setPreferredLocation(new Point(32, 51));
     }
     }

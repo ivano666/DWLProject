@@ -70,8 +70,8 @@ public class LoaderManager {
 		if (aDevs instanceof DWL_1_1) {
 			DWL_1_1 theParent = (DWL_1_1) aDevs; 
 			coordinator.addModel(aLoader);
-			coordinator.addCoupling(coordinator.getName(), Coord_0_0.getCatOut(), aLoader.getName(), Loader_0_0.getCatIn());
-			coordinator.addCoupling(aLoader.getName(), Loader_0_0.getDone(), coordinator.getName(), Coord_0_0.getLdrDone());
+			coordinator.addCoupling(coordinator.getName(), DWL_Coord_0_0.getCatOut(), aLoader.getName(), Loader_0_0.getCatIn());
+			coordinator.addCoupling(aLoader.getName(), Loader_0_0.getDone(), coordinator.getName(), DWL_Coord_0_0.getLdrDone());
 			coordinator.addCoupling(aLoader.getName(), Loader_0_0.getExtCatOut(), theParent.getName(), LOAD);
 		}
 	} 

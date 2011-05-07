@@ -12,8 +12,8 @@ import java.awt.Color;
 import model.modeling.content;
 import model.modeling.message;
 import view.modeling.ViewableAtomic;
-import GenCol.entity;
 import DWLProject.utils.DWLProperties;
+import GenCol.entity;
 
 /**
  * 
@@ -48,6 +48,7 @@ public class generator_0_0 extends ViewableAtomic {
 
 	public void initialize() {
 		holdIn(READY, 1);
+		this.setBackgroundColor(Color.MAGENTA);
 
 		count = 1000;
 		super.initialize();

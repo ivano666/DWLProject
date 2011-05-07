@@ -34,8 +34,12 @@ public class Transducer_0_0 extends ViewableAtomic{
 	private static final String MEASURES = "measures";
 	private static final String ERROR_FILE = "errorFile";
 	private static final String STATS = "stats";
+	private static final String DP_DONE = "DPDone";
+	private static final String HALT = "halt";
+
+	//phases
 	private static final String ACTIVE = "active";
-	private static final Object DP_DONE = "DPDone";
+	private static final String HALTING = "halting";
 	
 	private double clock;
 	private Map<String, CatFile> catFilesArrived;
@@ -71,10 +75,10 @@ public class Transducer_0_0 extends ViewableAtomic{
 //add test input ports:
         addTestInput(STATS, new FlatFile(100, 0, 5, 1, 2));
         addTestInput(ERROR_FILE, new ErrorFile(10, 1D));
-        addTestInput(STATS, new CatFile("Cat1", 100, 1, 5, 1, 1));
+        addTestInput(STATS, new CatFile("Cat1", 100, 1, 5, 1, 1, 1D));
         ExtCatFile anExtCatFile = new ExtCatFile("ExtCat1", 100, "L1", 2011, 1D, 1D);
         addTestInput(STATS, anExtCatFile);
-        addTestInput(STATS, new CatFile("Cat2", 100, 1, 5, 2, 1));
+        addTestInput(STATS, new CatFile("Cat2", 100, 1, 5, 2, 1, 1D));
         anExtCatFile = new ExtCatFile("ExtCat21", 100, "L1", 2011, 1D, 1D);
         addTestInput(STATS, anExtCatFile);
         anExtCatFile = new ExtCatFile("ExtCat22", 80, "L2", 2011, 1D, 1D);
@@ -120,7 +124,7 @@ public class Transducer_0_0 extends ViewableAtomic{
 							catFileCompleted.put(catFile.getName(), catFile);
 							totalCatTurnAround += clock
 									- catFile.getArrivalTime();
-							totalCatProcessingTime += catFile.getOriginalTimeToRegister();
+							totalCatProcessingTime += catFile.getProcessingTime();
 							totalRowsCat += catFile.getNumberOfRecords();
 						} else {
 							catFile.setArrivalTime(clock);
@@ -134,12 +138,15 @@ public class Transducer_0_0 extends ViewableAtomic{
 							totalExtCatProcessingTime += extCatFile.getProcessingTime();
 							totalRowsExtCat += extCatFile.getNumberOfRecords();
 						} else {
+							extCatFile.setArrivalTime(clock);
 							extCatFileArrived.put(extCatFile.getName(), extCatFile);
 						}
 						
 					}
 				} else if (val.getName().equals(DP_DONE)) {
 					flatFile.setCompletionTime(clock);
+				} else if (val.getName().equals(HALT)) {
+					holdIn(HALTING, 1);
 				}
 			}
 			if (messageOnPort(x, ERROR_FILE, i)) {

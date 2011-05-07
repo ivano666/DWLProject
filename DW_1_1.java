@@ -51,7 +51,7 @@ public class DW_1_1 extends ViewableDigraph {
         addOutport(HALT);
 
 		// add test input ports:
-        CatFile catFile = new CatFile("Cat1", 100, 1, 5, 3, 1);
+        CatFile catFile = new CatFile("Cat1", 100, 1, 5, 3, 1, 1D);
         ExtCatFile extCat = new ExtCatFile("ExtCat11", 100, "L1", 2011, 4, 1D);
         extCat.setParentCatFile(catFile);
         catFile.addExtCatFile(extCat);
@@ -65,6 +65,7 @@ public class DW_1_1 extends ViewableDigraph {
         catFile.addExtCatFile(extCat);
         addTestInput(EXT_CAT_IN, extCat);
         addTestInput(LOAD, new entity("start"));
+        addTestInput(STOP, new entity("stop"));
 
 		// Initialize sub-components
 		DW_Coord_0_0 coordinator = new DW_Coord_0_0("Coordinator");

@@ -329,6 +329,9 @@ public class DW_Coord_0_0 extends ViewableAtomic{
     // Add output function
     @Override
     public message out(){
+    	if (phaseIs(HALTING)) {
+    		return haltMessage;
+    	}
     	if (phaseIs(SEND_EXT_CAT) || phaseIs(SEND_CAT)) {
     		return outputMessage;
     	}

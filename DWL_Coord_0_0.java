@@ -33,10 +33,12 @@ public class DWL_Coord_0_0 extends ViewableAtomic{
 	private static final String COORD = "Coordinator";
 	//Input Ports
 	private static final String START = "start";
+	private static final String STOP = "stop";
 	private static final String FF_IN = "FFin";
 	private static final String CAT_FILE_IN = "CatFileIn";
 	private static final String LDR_DONE = "LdrDone";
 	private static final String DP_DONE = "DPDone";
+	private static final String HALT = "halt";
 
 	//Output Ports
     private static final String GET_FF = "GetFF";
@@ -54,6 +56,8 @@ public class DWL_Coord_0_0 extends ViewableAtomic{
 	private static final String RECEIVE_CAT = "ReceivingCat";
 	private static final String QUEUEING = "QueueingCat";
 	private static final String LDRS_DONE = "LoadersDone";
+	private static final String HALTING = "halting";
+	
 	/**
 	 * Takes 1 unit of time to queue an incoming Cat File 
 	 */
@@ -70,6 +74,7 @@ public class DWL_Coord_0_0 extends ViewableAtomic{
 	private message catFilesOutMessage;
 	private boolean doneDPReceived;
 	private message loadersDoneMessage;
+	private message haltMessage;
 
 	/**
 	 * Default Constructor
@@ -91,19 +96,21 @@ public class DWL_Coord_0_0 extends ViewableAtomic{
         addInport(DP_DONE);
         addInport(LDR_DONE);
         addInport(CAT_FILE_IN);
+        addInport(STOP);
 
         // Add output port names
         addOutport(CAT_OUT);
         addOutport(FF_OUT);
         addOutport(GET_FF);
         addOutport(LOAD);
+        addOutport(HALT);
 
 //add test input ports:
         addTestInput(START, new entity(START));
         addTestInput(FF_IN, new FlatFile());
-        addTestInput(CAT_FILE_IN, new CatFile("Cat1", 10, 10, 3, 1, 2011));
-        addTestInput(CAT_FILE_IN, new CatFile("Cat2", 10, 20, 2, 1, 2011), 5);
-        addTestInput(CAT_FILE_IN, new CatFile("Cat3", 10, 10, 5, 1, 2011), 15);
+        addTestInput(CAT_FILE_IN, new CatFile("Cat1", 10, 10, 3, 1, 2011, 1D));
+        addTestInput(CAT_FILE_IN, new CatFile("Cat2", 10, 20, 2, 1, 2011, 1D), 5);
+        addTestInput(CAT_FILE_IN, new CatFile("Cat3", 10, 10, 5, 1, 2011, 1D), 15);
         addTestInput(DP_DONE, new entity(DP_DONE));
 
 // Structure information end
@@ -129,6 +136,7 @@ public class DWL_Coord_0_0 extends ViewableAtomic{
 	@Override
     public void deltext(double e, message x){
 		Continue(e);
+		checkForHalt(x);
 		if (phaseIs(RECEIVE_CAT)) {
 			for (int i = 0; i < x.size(); i++) {
 				queueCatFile(x, i, e);
@@ -154,7 +162,21 @@ public class DWL_Coord_0_0 extends ViewableAtomic{
     	}
     }
 
-    /**
+    private void checkForHalt(message x) {
+		for (int i = 0; i < x.size(); i++) {
+			if (messageOnPort(x, STOP, i)) {
+				entity value = x.getValOnPort(STOP, i);
+				if (value.getName().equals(HALT)) {
+					holdIn(HALTING, 1);
+		    		this.setBackgroundColor(Color.GREEN);
+					haltMessage = new message();
+					haltMessage.add(makeContent(HALT, new entity(HALT)));
+				}
+			}
+		}
+	}
+
+	/**
      * Checks if the <code>DataPartitioner</code> has notified is done
      * sending files and thus 
      * @param x
@@ -296,6 +318,10 @@ public class DWL_Coord_0_0 extends ViewableAtomic{
 	@SuppressWarnings("unchecked")
 	@Override
     public void deltint(){
+		if (phaseIs(HALTING)) {
+			passivateIn(PASSIVE);
+			this.setBackgroundColor(Color.GRAY);
+		}
     	if (phaseIs(NOTIFY_CA)) {
     		passivateIn(PASSIVE);
 			this.setBackgroundColor(Color.GRAY);
@@ -357,6 +383,9 @@ public class DWL_Coord_0_0 extends ViewableAtomic{
 //    @SuppressWarnings("unchecked")
 	@Override
     public message out(){
+    	if (phaseIs(HALTING)) {
+    		return haltMessage;
+    	}
     	if (phaseIs(NOTIFY_CA)) {
 // TODO: Coupled model inside a coupled model does not refresh appropriately
 //			loadersQueue.addAll(LoaderManager.addLoadersToSystem(2, this));

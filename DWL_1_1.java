@@ -16,6 +16,7 @@ import view.modeling.ViewableAtomic;
 import view.modeling.ViewableComponent;
 import view.modeling.ViewableDigraph;
 import DWLProject.utils.DWLUtils;
+import GenCol.entity;
 
 /**
  * DWL_1_1.java
@@ -29,6 +30,8 @@ public class DWL_1_1 extends ViewableDigraph{
 	private static final String CAT_FILE_OUT = "CatFileOut";
 	private static final String GET_FF = "GetFF";
 	private static final String FF_OUT = "FFout";
+    private static final String STOP = "stop";
+    
 	//In ports
     private static final String START = "start";
 	private static final String FF_IN = "FFin";
@@ -57,15 +60,17 @@ public class DWL_1_1 extends ViewableDigraph{
         // Add input port names
         addInport(START);
         addInport(FF_IN);
-        addInport(HALT);
+        addInport(STOP);
 
         // Add output port names
         addOutport(EXT_CAT_OUT);
         addOutport(LOAD);
         addOutport(ERROR_FILE);
         addOutport(STATS);
+        addOutport(HALT);
 
         //add test input ports:
+        addTestInput(STOP, new entity("stop"));
 
         // Initialize sub-components
         ViewableAtomic CommAgent_1_0 =  new CommAgent_0_0("CommAgent");
@@ -85,12 +90,14 @@ public class DWL_1_1 extends ViewableDigraph{
         addCoupling(DataPartitioner_1_0, CAT_FILE_OUT, Coord_1_0, CAT_FILE_IN);
         addCoupling(this, FF_IN, CommAgent_1_0, FF_IN);
         addCoupling(this, START, Coord_1_0, START);
+        addCoupling(this, STOP, Coord_1_0, STOP);
         addCoupling(DataPartitioner_1_0, ERROR_FILE, this, ERROR_FILE);
         addCoupling(DataPartitioner_1_0, DP_DONE, Coord_1_0, DP_DONE);
         addCoupling(Coord_1_0, FF_OUT, this, STATS);
         addCoupling(Coord_1_0, CAT_OUT, this, STATS);
         addCoupling(DataPartitioner_1_0, DP_DONE, this, STATS);
         addCoupling(Coord_1_0, LOAD, this, LOAD);
+        addCoupling(Coord_1_0, HALT, this, HALT);
         
         
 // Structure information end
@@ -115,10 +122,9 @@ public class DWL_1_1 extends ViewableDigraph{
     public void layoutForSimView()
     {
         preferredSize = new Dimension(610, 471);
-        ((ViewableComponent)withName("Loader_2")).setPreferredLocation(new Point(243, 360));
-        ((ViewableComponent)withName("DataPartitioner")).setPreferredLocation(new Point(10, 160));
-        ((ViewableComponent)withName("Loader_1")).setPreferredLocation(new Point(246, 285));
-        ((ViewableComponent)withName("CommAgent")).setPreferredLocation(new Point(10, 47));
-        ((ViewableComponent)withName("Coordinator")).setPreferredLocation(new Point(221, 93));
+        ((ViewableComponent)withName("Coordinator")).setPreferredLocation(new Point(183, 149));
+        ((ViewableComponent)withName("Loader_1")).setPreferredLocation(new Point(258, 299));
+        ((ViewableComponent)withName("DataPartitioner")).setPreferredLocation(new Point(21, 331));
+        ((ViewableComponent)withName("CommAgent")).setPreferredLocation(new Point(16, 54));
     }
 }

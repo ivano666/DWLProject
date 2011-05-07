@@ -6,6 +6,7 @@ package DWLProject;
 import java.util.ArrayList;
 import java.util.List;
 
+import DWLProject.utils.DWLUtils;
 import GenCol.entity;
 
 /**
@@ -19,7 +20,6 @@ import GenCol.entity;
  */
 public class CatFile extends entity {
 
-	private static final double DEFAULT_REGISTRATION_TIME = 10D;
 	private static final int DEFAULT_NUMBER_OF_RECORDS = 100;
 	private static final String CAT1 = "Cat1";
 	private int numberOfRecords;
@@ -30,6 +30,7 @@ public class CatFile extends entity {
 	private int years;
 	private double arrivalTime;
 	private double completionTime;
+	private double processingTime;
 	private List<ExtCatFile> extCatList;
 	private List<ExtCatFile> processedExtCatList;
 	
@@ -37,7 +38,7 @@ public class CatFile extends entity {
 	 * Default Constructor
 	 */
 	public CatFile() {
-		this(CAT1, DEFAULT_NUMBER_OF_RECORDS, DEFAULT_REGISTRATION_TIME, 3, 1, 1);
+		this(CAT1, DEFAULT_NUMBER_OF_RECORDS, DWLUtils.DEFAULT_REGISTRATION_TIME, 3, 1, 1, 1D);
 	}
 
 	/**
@@ -47,10 +48,11 @@ public class CatFile extends entity {
 	 * @param numberOfRecords
 	 * @param timeToRegister
 	 * @param dimensions
-	 * @param summaryLevel
 	 * @param years
+	 * @param summaryLevel
+	 * @param processingTime
 	 */
-	public CatFile(String name, int numberOfRecords, double timeToRegister, int dimensions, int summaryLevels, int years) {
+	public CatFile(String name, int numberOfRecords, double timeToRegister, int dimensions, int summaryLevels, int years, double processingTime) {
 		super(name);
 		this.numberOfRecords = numberOfRecords;
 		this.timeToRegister = timeToRegister;
@@ -58,6 +60,7 @@ public class CatFile extends entity {
 		this.numberOfDimensions = dimensions;
 		this.numberOfSummaryLevels = summaryLevels;
 		this.years = years;
+		this.processingTime = processingTime;
 		extCatList = new ArrayList<ExtCatFile>();
 		processedExtCatList = new ArrayList<ExtCatFile>();
 	}
@@ -121,5 +124,13 @@ public class CatFile extends entity {
 	public boolean isCompleted() {
 		return !extCatList.isEmpty() && !processedExtCatList.isEmpty() 
 		&& (extCatList.size() == processedExtCatList.size());
+	}
+
+	public double getProcessingTime() {
+		return processingTime;
+	}
+
+	public void setProcessingTime(double processingTime) {
+		this.processingTime = processingTime;
 	}
 }

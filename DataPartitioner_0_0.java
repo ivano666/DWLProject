@@ -10,21 +10,21 @@
 package DWLProject;
 
 import java.awt.Color;
-import java.util.Random;
 
 import model.modeling.message;
 import view.modeling.ViewableAtomic;
 import DWLProject.utils.DWLProperties;
+import DWLProject.utils.DWLUtils;
 import GenCol.entity;
 
 public class DataPartitioner_0_0 extends ViewableAtomic {
 	private FlatFile flatFile;
 	private CatFile aCatFile;
 	private int[] catNumRecords, catDims, catSumLevels, catYears;
-	private int MAX_DIMENSIONS = Integer.valueOf(DWLProperties.getInstance().getValue("MAX_DIMENSIONS"));
-	private int MAX_SUMLEVELS = Integer.valueOf(DWLProperties.getInstance().getValue("MAX_SUMLEVELS"));
-	private int YEARS = Integer.valueOf(DWLProperties.getInstance().getValue("NumberOfYears"));
-	private int REG_FACTOR_CAT = Integer.valueOf(DWLProperties.getInstance().getValue("regFactorCAT"));
+	private static int MAX_DIMENSIONS = Integer.valueOf(DWLProperties.getInstance().getValue("MAX_DIMENSIONS"));
+	private static int MAX_SUMLEVELS = Integer.valueOf(DWLProperties.getInstance().getValue("MAX_SUMLEVELS"));
+	private static int YEARS = Integer.valueOf(DWLProperties.getInstance().getValue("NumberOfYears"));
+	private static int PROCESSING_FACTOR_CAT = Integer.valueOf(DWLProperties.getInstance().getValue("processingFactorCAT"));
 	
 	
 //Declare cats, years, HERE
@@ -193,12 +193,15 @@ public class DataPartitioner_0_0 extends ViewableAtomic {
 			for (int i = 0; i < cats; i++) {
 				String catName = "CAT" + i;
 				//double regTime = rand.nextInt(5);
-				double regTime = catNumRecords[i]/REG_FACTOR_CAT;
-				regTime = Double.compare(regTime, 0D) == 1 ? regTime : 1D;
+				double processingTime;
+				if (Double.compare(PROCESSING_FACTOR_CAT, 0D) > 0) 
+					processingTime = Double.valueOf(catNumRecords[i])/PROCESSING_FACTOR_CAT;
+				else 
+					processingTime = DWLUtils.DEFAULT_PROCESSING_TIME;
 				
 				if (catNumRecords[i]>0){
-					aCatFile = new CatFile(catName, catNumRecords[i], regTime,
-							MAX_DIMENSIONS, MAX_SUMLEVELS, YEARS);
+					aCatFile = new CatFile(catName, catNumRecords[i], DWLUtils.DEFAULT_REGISTRATION_TIME,
+							MAX_DIMENSIONS, MAX_SUMLEVELS, YEARS, processingTime);
 					catFileMessage.add(makeContent(CAT_FILE_OUT, aCatFile));
 					//ttText = ttText + catName + " #recs: " + catNumRecords[i] + " #dims: "+ catDims[i] + 
 					//" #SummLevels: " + catSumLevels[i]+ " #years: " + catYears[i]+nL;

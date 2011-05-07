@@ -25,6 +25,8 @@ public class DWLUtils {
 	private static final String LOAD = "load";
 	private static final String LOADER = "Loader_";
 	private static final String WRITER = "Writer_";
+	public static final double DEFAULT_PROCESSING_TIME = 0.1D;
+	public static final double DEFAULT_REGISTRATION_TIME = 0.1D;
 
 	private DWLUtils() {
 	}
