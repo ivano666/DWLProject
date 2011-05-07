@@ -148,7 +148,8 @@ public class DataPartitioner_0_0 extends ViewableAtomic {
 				else
 					catNumRecords[i] = remainingRecords;
 				totalRecsAssigned += catNumRecords[i];
-				remainingRecords -= totalRecsAssigned;
+				//remainingRecords -= totalRecsAssigned;
+				remainingRecords -= catNumRecords[i];
 			}
 			}
 			/*
