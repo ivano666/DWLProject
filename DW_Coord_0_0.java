@@ -36,7 +36,6 @@ public class DW_Coord_0_0 extends ViewableAtomic{
 	private static final String QUEUEING = "QueueingCat";
 	private static final String RECEIVING_EXT_CAT = "ReceivingExtCat";
 	private static final String SEND_EXT_CAT = "SendingExtCat";
-	private static final String SEND_CAT = "SendingCat";
 	private static final String WRITERS_DONE = "WritersDone";
 	
 	private static final String START = "start";
@@ -100,7 +99,6 @@ public class DW_Coord_0_0 extends ViewableAtomic{
         currentCatFile = null;
         catFileQueue = new Queue();
         workingCatFileQueue = new Queue();
-//        processedCatFileQueue = new Queue();
         completedCatFileQueue = new Queue();
         workingExtCatFileQueue = new Queue();
         pendingExtCatFileQueue = new Queue();
@@ -135,7 +133,6 @@ public class DW_Coord_0_0 extends ViewableAtomic{
 					if (!completedCatFileQueue.contains(parentCatFile)) {
 						completedCatFileQueue.add(parentCatFile);
 						currentCatFile = null;
-						holdIn(SEND_CAT, 1);
 						outputMessage = new message();
 		        		Pair aPair = new Pair(parentCatFile.getName(), parentCatFile);
 		        		outputMessage.add(makeContent(CAT_OUT, aPair));
@@ -158,7 +155,9 @@ public class DW_Coord_0_0 extends ViewableAtomic{
 
 	@SuppressWarnings("unchecked")
 	private void sendExtCatToWriters() {
-		outputMessage = new message();
+		if (outputMessage == null) {
+			outputMessage = new message();
+		}
 		if (currentCatFile == null && !workingCatFileQueue.isEmpty()) {
 			currentCatFile = (CatFile) workingCatFileQueue.remove();
     	    if (currentCatFile.getProcessedExtCatList().isEmpty()) {
@@ -310,11 +309,6 @@ public class DW_Coord_0_0 extends ViewableAtomic{
 				holdIn(PASSIVE, INFINITY);
     			this.setBackgroundColor(Color.GRAY);
 			}
-		} else if (phaseIs(SEND_CAT)) {
-			if (catFileQueue.size() == completedCatFileQueue.size()) {
-				holdIn(WRITERS_DONE, 0);
-				this.setBackgroundColor(Color.MAGENTA);
-			}
 		}
     }
 
@@ -328,13 +322,15 @@ public class DW_Coord_0_0 extends ViewableAtomic{
     // Add output function
     @Override
     public message out(){
+    	message theMessage = NULL_MESSAGE;
     	if (phaseIs(HALTING)) {
-    		return haltMessage;
+    		theMessage = haltMessage;
     	}
-    	if (phaseIs(SEND_EXT_CAT) || phaseIs(SEND_CAT)) {
-    		return outputMessage;
+    	if (phaseIs(SEND_EXT_CAT)) {
+    		theMessage = outputMessage;
     	}
-    	return NULL_MESSAGE;
+    	outputMessage = null;
+    	return theMessage;
     }
 
 	@Override
