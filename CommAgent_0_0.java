@@ -23,7 +23,6 @@ public class CommAgent_0_0 extends ViewableAtomic{
     
   //Phases
 	private static final String PASSIVE = "passive";
-	private static final String START = "start";
 	private static final String RECEIVE_FF = "Receive";
 	private static final String SEND_FF = "Send";
 	
@@ -32,6 +31,7 @@ public class CommAgent_0_0 extends ViewableAtomic{
 	//Output Ports
 	private static final String FF_OUT = "FFout";
 	
+	private static final String START = "start";
 	
 	//private static final String DONE = "Done";
     // Add Default Constructor

@@ -140,7 +140,6 @@ public class DW_Coord_0_0 extends ViewableAtomic{
 				}
 				holdIn(SEND_EXT_CAT, 0);
 				this.setBackgroundColor(Color.MAGENTA);
-	    		sendExtCatToWriters();
 			}
 		}
 		
@@ -148,7 +147,6 @@ public class DW_Coord_0_0 extends ViewableAtomic{
     			&& pendingExtCatFileQueue.isEmpty()
     			&& startReceived) {
     		holdIn(SEND_EXT_CAT, 0);
-    		sendExtCatToWriters();
 			this.setBackgroundColor(Color.MAGENTA);
     	}
     }
@@ -296,7 +294,6 @@ public class DW_Coord_0_0 extends ViewableAtomic{
 			} else if (startReceived) {
 				holdIn(SEND_EXT_CAT, 0);
 				this.setBackgroundColor(Color.MAGENTA);
-				sendExtCatToWriters();
 			}
 		} else if (phaseIs(WRITERS_DONE)) {
 			passivateIn(PASSIVE);
@@ -327,6 +324,7 @@ public class DW_Coord_0_0 extends ViewableAtomic{
     		theMessage = haltMessage;
     	}
     	if (phaseIs(SEND_EXT_CAT)) {
+    		sendExtCatToWriters();
     		theMessage = outputMessage;
     	}
     	outputMessage = null;
@@ -347,6 +345,9 @@ public class DW_Coord_0_0 extends ViewableAtomic{
 	@Override
 	public String getTooltipText() {
 		StringBuilder myBuilder = new StringBuilder();
+		myBuilder.append("\n");
+		myBuilder.append("Registering ExtCatFile: ");
+		myBuilder.append(currentExtCatFile != null ? currentExtCatFile.getName() : "null");
 		myBuilder.append("\n");
 		myBuilder.append("Writers Queue: ");
 		myBuilder.append(writersQueue);

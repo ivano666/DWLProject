@@ -42,6 +42,7 @@ public class Loader_0_0 extends ViewableAtomic {
 	
 	private CatFile currentCatFile;
 	private message outputMessage;
+	private List<ExtCatFile> theFiles;
 	
 	// Add Default Constructor
 	public Loader_0_0() {
@@ -82,6 +83,7 @@ public class Loader_0_0 extends ViewableAtomic {
 		sigma = INFINITY;
 		outputMessage = null;
 		currentCatFile = null;
+		theFiles = null;
 	}
 
 	@Override
@@ -112,6 +114,7 @@ public class Loader_0_0 extends ViewableAtomic {
 						currentCatFile = (CatFile) aPair.getValue();
 						holdIn(BUSY, currentCatFile.getProcessingTime());
 						this.setBackgroundColor(Color.ORANGE);
+						theFiles = createExtCatFiles();
 					}
 					else {
 						System.out.println("Not a Cat File: " + value.getName());
@@ -132,8 +135,6 @@ public class Loader_0_0 extends ViewableAtomic {
 		if(phaseIs(BUSY)) {
 			holdIn(SENDING, 0);
 			this.setBackgroundColor(Color.ORANGE);
-			List<ExtCatFile> theFiles = createExtCatFiles();
-			prepareOutput(theFiles);
 		}
 	}
 
@@ -209,6 +210,7 @@ public class Loader_0_0 extends ViewableAtomic {
 	@Override
 	public message out() {
 		if(phaseIs(SENDING)) {
+			prepareOutput(theFiles);			
 			return outputMessage;
 		}	
 		return NULL_MESSAGE;
@@ -253,5 +255,10 @@ public class Loader_0_0 extends ViewableAtomic {
 			return super.getTooltipText();
 		else
 			return super.getTooltipText() + myBuilder.toString();
+	}
+
+	@Override
+	public String toString() {
+		return this.getName();
 	}
 }

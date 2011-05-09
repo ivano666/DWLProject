@@ -132,7 +132,6 @@ public class Writer_0_0 extends ViewableAtomic {
 		if (phaseIs(BUSY)) {
 			currentExtCatFile.setStatus(ExtCatFileStatus.COMPLETED);
 			currentExtCatFile.getParentCatFile().addProcessedExtCatFile(currentExtCatFile);
-			prepareOutput();
 			holdIn(DONE, 0);
 			this.setBackgroundColor(Color.ORANGE);
 		}
@@ -157,6 +156,7 @@ public class Writer_0_0 extends ViewableAtomic {
 	@Override
 	public message out() {
 		if (phaseIs(DONE)) {
+			prepareOutput();
 			return outputMessage;
 		}
 		return NULL_MESSAGE;
@@ -199,4 +199,10 @@ public class Writer_0_0 extends ViewableAtomic {
 		myBuilder.append(currentExtCatFile != null ? currentExtCatFile : EMPTY_STRING);
 		return super.getTooltipText() + myBuilder.toString();
 	}
+
+	@Override
+	public String toString() {
+		return this.getName();
+	}
+	
 }

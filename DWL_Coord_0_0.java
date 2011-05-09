@@ -368,8 +368,6 @@ public class DWL_Coord_0_0 extends ViewableAtomic{
     	if (phaseIs(SEND_CAT)) {
     		if (catFileQueue.size() == completedCatQueue.size()) {
     			holdIn(LDRS_DONE, 0);
-        		loadersDoneMessage = new message();
-        		loadersDoneMessage.add(makeContent(LOAD, new entity("start")));
     			this.setBackgroundColor(Color.GREEN);
     		} else {
     			passivateIn(PASSIVE);
@@ -391,7 +389,7 @@ public class DWL_Coord_0_0 extends ViewableAtomic{
     		return haltMessage;
     	}
     	if (phaseIs(NOTIFY_CA)) {
-// TODO: Coupled model inside a coupled model does not refresh appropriately
+// TODO: Coupled model inside a coupled model does not refresh appropriately when using ad-hoc addition of models at runtime
 //			loadersQueue.addAll(LoaderManager.addLoadersToSystem(2, this));
     		return loadFileMessage;
     	}
@@ -402,6 +400,8 @@ public class DWL_Coord_0_0 extends ViewableAtomic{
     		return catFilesOutMessage;
     	}
     	if (phaseIs(LDRS_DONE)) {
+    		loadersDoneMessage = new message();
+    		loadersDoneMessage.add(makeContent(LOAD, new entity("start")));
     		return loadersDoneMessage;
     	}
     	return NULL_MESSAGE;

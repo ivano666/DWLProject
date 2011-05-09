@@ -20,15 +20,14 @@ import GenCol.entity;
 public class DataPartitioner_0_0 extends ViewableAtomic {
 	private FlatFile flatFile;
 	private CatFile aCatFile;
-	private int[] catNumRecords, catDims, catSumLevels, catYears;
+	private int[] catNumRecords;
 	private static int MAX_DIMENSIONS = Integer.valueOf(DWLProperties.getInstance().getValue("MAX_DIMENSIONS"));
 	private static int MAX_SUMLEVELS = Integer.valueOf(DWLProperties.getInstance().getValue("MAX_SUMLEVELS"));
 	private static int YEARS = Integer.valueOf(DWLProperties.getInstance().getValue("NumberOfYears"));
 	private static int PROCESSING_FACTOR_CAT = Integer.valueOf(DWLProperties.getInstance().getValue("processingFactorCAT"));
 	
 	
-//Declare cats, years, HERE
-	private  int cats, recs, validRecs, years, errors, totalRecsAssigned; 
+	private  int cats, recs, validRecs, errors, totalRecsAssigned; 
 	private static final String FF_IN = "FFin";
 	private static final String CAT_FILE_OUT = "CatFileOut";
 	private static final String ERROR_FILE = "errorFile";
@@ -120,83 +119,30 @@ public class DataPartitioner_0_0 extends ViewableAtomic {
 			holdIn(CREATE_CAT, processingTime);
 			this.setBackgroundColor(Color.PINK);
 		} else if (phaseIs(CREATE_CAT)) {
-			//Random rand = new Random();
 			recs = flatFile.getNumberOfRecords();
-			//int randDimsInCat;
-			//int randSumLevelsInCat;
 			cats = flatFile.getNumberOfCategories();
 			errors = flatFile.getNumberOfErrors();
-			years = flatFile.getNumberOfYears();
-			//int randYearsInCat;
 			validRecs = recs - errors;
 			int remainingRecords = validRecs;
 			totalRecsAssigned = 0;
 
-			/*/ Fill CAT arrays with random numbers when appropriate
-			catNumRecords = new int[cats];
-			for (int i = 0; i < cats; i++) {
-				if (i == cats - 1 && remainingRecords > 0) // ensure the total of records are assigned 
-					catNumRecords[i] = remainingRecords;
-				else
-					catNumRecords[i] = rand.nextInt(validRecs + 1);
-				totalRecsAssigned += catNumRecords[i];
-				remainingRecords -= totalRecsAssigned;
-			}
-			; */
 			//The total number of valid records are split evenly between all the categories
 			if (cats >0){
-			catNumRecords = new int[cats];
-			for (int i = 0; i < cats; i++) {
-				if (remainingRecords > validRecs/cats)  
-					catNumRecords[i] = validRecs/cats;
-				else
-					catNumRecords[i] = remainingRecords;
-				totalRecsAssigned += catNumRecords[i];
-				//remainingRecords -= totalRecsAssigned;
-				remainingRecords -= catNumRecords[i];
+				catNumRecords = new int[cats];
+				for (int i = 0; i < cats; i++) {
+					if (remainingRecords > validRecs/cats)  
+						catNumRecords[i] = validRecs/cats;
+					else
+						catNumRecords[i] = remainingRecords;
+					totalRecsAssigned += catNumRecords[i];
+					remainingRecords -= catNumRecords[i];
+				}
 			}
-			}
-			/*
-			// Fill CAT Number of Dimensions Array (Any category may have from 1 to MAX_DIMENSIONS)
-			catDims = new int[cats];
-			for (int i = 0; i < cats; i++) {
-				randDimsInCat = rand.nextInt(MAX_DIMENSIONS);
-				catDims[i] = randDimsInCat + 1;
-			}
-
-			// Fill CAT Number of Summary Levels Array
-			catSumLevels = new int[cats];
-			for (int i = 0; i < cats; i++) {
-				randSumLevelsInCat = rand.nextInt(MAX_SUMLEVELS);
-				catSumLevels[i] = randSumLevelsInCat + 1;
-			}
-
-			// Fill CAT YEARS Array
-			catYears = new int[cats];
-			for (int i = 0; i < cats; i++) {
-				randYearsInCat = rand.nextInt(years);
-				catYears[i] = randYearsInCat + 1;
-			}
-*/
 			// Create the CAT Files
 			catFileMessage = new message();
-/*
-			for (int i = 0; i < cats; i++) {
-				String catName = "CAT" + i;
-				double regTime = rand.nextInt(5);
-				regTime = Double.compare(regTime, 0D) == 1 ? regTime : 1D;
-				if (catNumRecords[i]>0){
-					aCatFile = new CatFile(catName, catNumRecords[i], regTime,
-						catDims[i], catSumLevels[i], catYears[i]);
-					catFileMessage.add(makeContent(CAT_FILE_OUT, aCatFile));
-					ttText = ttText + catName + " #recs: " + catNumRecords[i] + " #dims: "+ catDims[i] + 
-					" #SummLevels: " + catSumLevels[i]+ " #years: " + catYears[i]+nL;
-				}
-			}   */
 			
 			for (int i = 0; i < cats; i++) {
 				String catName = "CAT" + i;
-				//double regTime = rand.nextInt(5);
 				double processingTime = DWLUtils.DEFAULT_PROCESSING_TIME;;
 				if (Double.compare(PROCESSING_FACTOR_CAT, 0D) > 0) {
 					for (int k = 1; k <= MAX_SUMLEVELS; k++) {
@@ -208,8 +154,6 @@ public class DataPartitioner_0_0 extends ViewableAtomic {
 					aCatFile = new CatFile(catName, catNumRecords[i], DWLUtils.DEFAULT_REGISTRATION_TIME,
 							MAX_DIMENSIONS, MAX_SUMLEVELS, YEARS, processingTime);
 					catFileMessage.add(makeContent(CAT_FILE_OUT, aCatFile));
-					//ttText = ttText + catName + " #recs: " + catNumRecords[i] + " #dims: "+ catDims[i] + 
-					//" #SummLevels: " + catSumLevels[i]+ " #years: " + catYears[i]+nL;
 					ttText = ttText + catName + " #recs: " + catNumRecords[i] + " #dims: "+ MAX_DIMENSIONS + 
 					" #SummLevels: " + MAX_SUMLEVELS+ " #years: " + YEARS+nL;
 				}
