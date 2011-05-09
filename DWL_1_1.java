@@ -122,9 +122,9 @@ public class DWL_1_1 extends ViewableDigraph{
     public void layoutForSimView()
     {
         preferredSize = new Dimension(610, 471);
-        ((ViewableComponent)withName("Loader_1")).setPreferredLocation(new Point(258, 299));
-        ((ViewableComponent)withName("CommAgent")).setPreferredLocation(new Point(16, 54));
-        ((ViewableComponent)withName("DataPartitioner")).setPreferredLocation(new Point(21, 331));
-        ((ViewableComponent)withName("Coordinator")).setPreferredLocation(new Point(183, 149));
+        ((ViewableComponent)withName("Coordinator")).setPreferredLocation(new Point(168, 128));
+        ((ViewableComponent)withName("CommAgent")).setPreferredLocation(new Point(0, 73));
+        ((ViewableComponent)withName("DataPartitioner")).setPreferredLocation(new Point(10, 294));
+        ((ViewableComponent)withName("Loader_1")).setPreferredLocation(new Point(222, 337));
     }
 }

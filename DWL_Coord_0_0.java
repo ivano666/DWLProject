@@ -155,13 +155,11 @@ public class DWL_Coord_0_0 extends ViewableAtomic{
 				completedCatQueue.add(aCatFile);
 	    		holdIn(SEND_CAT, 0);
 	    		this.setBackgroundColor(Color.GREEN);
-	    		sendCatFilesToLoaders();
 			}
 		}
     	if (phaseIs(PASSIVE) && doneDPReceived) {
     		holdIn(SEND_CAT, 0);
     		this.setBackgroundColor(Color.GREEN);
-    		sendCatFilesToLoaders();
     	}
     }
 
@@ -199,7 +197,7 @@ public class DWL_Coord_0_0 extends ViewableAtomic{
      * Creates the messages for the loaders 
      */
 	private void sendCatFilesToLoaders() {
-		catFilesOutMessage = new message();
+		if (catFilesOutMessage == null)	catFilesOutMessage = new message();
 		while (!loadersQueue.isEmpty() && !workingCatFileQueue.isEmpty()) {
 			Loader_0_0 aLoader = (Loader_0_0)loadersQueue.remove();
 			CatFile aCatFile = (CatFile) workingCatFileQueue.remove();
@@ -385,26 +383,29 @@ public class DWL_Coord_0_0 extends ViewableAtomic{
 //    @SuppressWarnings("unchecked")
 	@Override
     public message out(){
+		message theMessage = NULL_MESSAGE;
     	if (phaseIs(HALTING)) {
-    		return haltMessage;
+    		theMessage = haltMessage;
     	}
     	if (phaseIs(NOTIFY_CA)) {
 // TODO: Coupled model inside a coupled model does not refresh appropriately when using ad-hoc addition of models at runtime
 //			loadersQueue.addAll(LoaderManager.addLoadersToSystem(2, this));
-    		return loadFileMessage;
+    		theMessage = loadFileMessage;
     	}
     	if (phaseIs(SEND_FF)) {
-    		return partitionFileMessage;
+    		theMessage = partitionFileMessage;
     	}
     	if (phaseIs(SEND_CAT)) {
-    		return catFilesOutMessage;
+    		sendCatFilesToLoaders();
+    		theMessage = catFilesOutMessage;
+    		catFilesOutMessage = null;
     	}
     	if (phaseIs(LDRS_DONE)) {
     		loadersDoneMessage = new message();
     		loadersDoneMessage.add(makeContent(LOAD, new entity("start")));
-    		return loadersDoneMessage;
+			theMessage = loadersDoneMessage;
     	}
-    	return NULL_MESSAGE;
+    	return theMessage;
     }
 
     /**

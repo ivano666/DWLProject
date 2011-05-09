@@ -158,9 +158,11 @@ public class DW_Coord_0_0 extends ViewableAtomic{
 		}
 		if (currentCatFile == null && !workingCatFileQueue.isEmpty()) {
 			currentCatFile = (CatFile) workingCatFileQueue.remove();
-    	    if (currentCatFile.getProcessedExtCatList().isEmpty()) {
-    	    	workingExtCatFileQueue.addAll(currentCatFile.getExtCatList());
-    	    }
+			while (workingExtCatFileQueue.size() <= writersQueue.size()) {
+	    	    if (currentCatFile.getProcessedExtCatList().isEmpty()) {
+	    	    	workingExtCatFileQueue.addAll(currentCatFile.getExtCatList());
+	    	    }
+			}
 		}
 		while (!writersQueue.isEmpty() && !workingExtCatFileQueue.isEmpty()) {
 			Writer_0_0 aWriter = (Writer_0_0)writersQueue.remove();

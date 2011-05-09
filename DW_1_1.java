@@ -103,6 +103,7 @@ public class DW_1_1 extends ViewableDigraph {
     public void layoutForSimView()
     {
         preferredSize = new Dimension(475, 473);
+        ((ViewableComponent)withName("Writer_2")).setPreferredLocation(new Point(58, 367));
         ((ViewableComponent)withName("Coordinator")).setPreferredLocation(new Point(41, 108));
         ((ViewableComponent)withName("Writer_1")).setPreferredLocation(new Point(55, 297));
     }
