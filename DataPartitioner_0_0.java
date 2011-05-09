@@ -114,7 +114,7 @@ public class DataPartitioner_0_0 extends ViewableAtomic {
 		if (phaseIs(RECEIVE_FF)) {
 			double processingTime = DWLUtils.DEFAULT_PROCESSING_TIME;
 			if (Double.compare(PROCESSING_FACTOR_CAT, 0D) > 0) {
-				processingTime = Math.max(processingTime, flatFile.getNumberOfRecords()/PROCESSING_FACTOR_CAT);
+				processingTime = Math.max(processingTime, (flatFile.getNumberOfRecords() - flatFile.getNumberOfErrors())/PROCESSING_FACTOR_CAT);
 			} 
 			holdIn(CREATE_CAT, processingTime);
 			this.setBackgroundColor(Color.PINK);
@@ -140,13 +140,13 @@ public class DataPartitioner_0_0 extends ViewableAtomic {
 			}
 			// Create the CAT Files
 			catFileMessage = new message();
-			
+			int years = flatFile.getNumberOfYears();
 			for (int i = 0; i < cats; i++) {
 				String catName = "CAT" + i;
 				double processingTime = DWLUtils.DEFAULT_PROCESSING_TIME;;
 				if (Double.compare(PROCESSING_FACTOR_CAT, 0D) > 0) {
 					for (int k = 1; k <= MAX_SUMLEVELS; k++) {
-						processingTime = Math.max(processingTime, Double.valueOf(catNumRecords[i])/(k *PROCESSING_FACTOR_CAT));
+						processingTime = Math.max(processingTime, Double.valueOf(catNumRecords[i])/(k * years * PROCESSING_FACTOR_CAT));
 					}
 				}
 				
